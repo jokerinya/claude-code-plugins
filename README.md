@@ -8,6 +8,8 @@ The shared home for the Agentlemen team's Claude Code plugins and skills. This r
 |---|---|
 | [`reviewer-tieto`](plugins/reviewer-tieto/) | Earned-trust AI review (Junction 2026 · Tieto): explainable risk routing, six evidence-based lenses, an adversarial verifier and a Trust Dossier a named human signs, with outcome metrics |
 
+Also here, not a plugin: [`review-map/`](review-map/), a Node tool and GitHub Actions workflow that runs an agent-written change on real inputs before and after, and records the evidence. `reviewer-tieto` imports its measurements as executed evidence.
+
 ## Getting the plugins
 
 The repo is **private** for now (it goes public when we submit for Junction 2026). Ask the repo owner to add your GitHub account as a collaborator first.

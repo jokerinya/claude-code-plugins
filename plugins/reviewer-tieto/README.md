@@ -67,10 +67,25 @@ git checkout ju26-issue-2283
 
 The scripts use only the Python 3 standard library. A team's own profile goes in `<repo>/.trust-review/profile/` and wins over bundled ones. Commit `<repo>/.trust-review/ledger.jsonl`: it is the team's track record.
 
+## Executed evidence from review-map
+
+[`review-map`](../../review-map/) runs a change on real inputs and on the repo's tests, before and after, in a CI job that holds no secrets. When a recorded run exists for the commit under review, `trust-review` imports what its scripts measured and the verifier does not repeat it:
+
+```
+/reviewer-tieto:trust-review "#2234" --evidence <review-map output dir>
+```
+
+| Imported (measured by scripts, `E1-executed`) | Not imported |
+|---|---|
+| Test outcomes before and after · which new tests fail without the change · which changed lines ran · runs with each part of the change removed · the known-break run · reduced-confidence notes · computed findings and not-checked items | The review-map agent's summary, claims and decisions. Judgment stays with the lenses. Its pipeline diagram is shown as a picture, labelled "not evidence" |
+
+A run recorded on a different commit is rejected as stale and listed under "What was not checked". Without a run, or in a repo with no review-map adapter, the review works as before. Script: `skills/trust-review/scripts/import_review_map.py`.
+
 ## Limits (by design)
 
 - It is a reference implementation of a concept, not a product. Only one repo profile exists so far.
 - Profile rules learned from a review carry provenance tags. Changes used for evaluation (holdouts) must not shape the profile. See `../../docs/decision-log.md`.
+- review-map needs a hand-written adapter per codebase. Only `messagepack` exists, so other repos get no imported evidence.
 - Without a .NET SDK the verifier cannot execute tests, so evidence tops out at E2 and the dossier says so.
 - Area trust needs history. A new team starts **neutral**, which means routing is conservative.
 - `lens-followup` re-reviews against the previous dossier. The original GitHub Managed Agents pipeline wiring is not part of this fork.

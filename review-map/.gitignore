@@ -1,0 +1,9 @@
+node_modules/
+# Run output is not committed. One recorded run is kept as a sample: the gate test and the
+# reviewer-tieto bridge test read it.
+out/*
+!out/local-2234/
+*.trx
+*.cobertura.xml
+# Logs hold local machine paths.
+*.log

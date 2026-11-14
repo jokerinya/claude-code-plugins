@@ -19,6 +19,7 @@ Arguments: $ARGUMENTS
 - **Base:** the next argument, if it names a branch that exists. Otherwise use the default from the `evidence-protocol` skill (`origin/HEAD`). Show the base you chose, because it changes the diff. **If the requested base and `origin/HEAD` give different merge bases**, list the commits that differ (`git log --oneline <mb-default>..<mb-requested>` and the reverse), pass them to every lens as "base-branch commits, not this change's own work", and add a base-branch question for the owner as the first abstention. (Lesson log: a bot commit already on the default branch was once mistaken for part of the change and flagged as blocking.)
 - **Owner:** `--owner "Name"`. If it is missing, use `git config user.name` and mark it "(assumed: confirm at sign-off)".
 - **Requirement text:** the rest. If it is a file path, read it. If it is a GitHub issue, fetch it in step 1 with `fetch_requirement.py` (never by reading the issue freehand).
+- **Executed evidence:** `--evidence <dir>` names a recorded review-map run for this change (a folder with `analysis.json`). If it is missing, look for `<repo>/.review-map/out/` and `<repo>/review-map-out/`. With none, the review runs as before and the verifier does its own execution.
 
 ## 1. Find the change, the repo profile, and triage
 
@@ -35,13 +36,17 @@ Arguments: $ARGUMENTS
    Every lens and the verifier use these ids. A lens may add derived criteria (`binding: "derived"`), never binding ones.
 3. Area trust: if `<repo>/.trust-review/ledger.jsonl` exists, run `python3 <sign-off base dir>/scripts/trust_ledger.py --repo <repo> area-trust [--policy <profile dir>/policy.json] > <repo>/.trust-review/area-trust.json`.
 4. Run `risk-triage` (`risk_triage.py --repo <repo> --base <merge-base> [--profile <profile dir>] [--area-trust ...]`) and save its output to `$OUT/triage.json`.
+5. **Executed evidence from review-map (when a run exists).** Run `python3 <this skill's base directory>/scripts/import_review_map.py --dir <run dir> --head <HEAD sha> --merge-base <merge-base> --out $OUT`. It writes `$OUT/executed-evidence.json` and `$OUT/executed-evidence.md`:
+   - **exit 0, imported:** review-map's scripts ran this exact commit. Their measurements (ids `EX-TESTS`, `EX-PROOF`, `EX-COVERAGE`, `EX-PARTS`, `EX-KNOWN-BREAK`) are `E1-executed` facts for every lens and for the verifier. Only script-measured facts are imported. The review-map agent's own summary, claims and decisions are not: judgment stays with the lenses.
+   - **exit 2, stale or unusable:** the run was recorded on another commit, or cannot be read. Import nothing. Add "review-map evidence not used: <reason>" to "What was not checked", and let the verifier execute as usual.
+   - `reduced_confidence` and `base_note` lines go on the dossier, next to the evidence they weaken.
 
 ## 2. Run six lenses in parallel (one message)
 
 Start these agents from the reviewer-tieto plugin (they may be listed as `reviewer-tieto:<name>`):
 `intent-reviewer`, `correctness-reviewer`, `security-reviewer`, `compatibility-reviewer`, `documentation-reviewer`, `verifiability-reviewer`.
 
-Give each the same prompt: repo path, base, merge base, review id, **the paths of `$OUT/requirement.md` and `$OUT/criteria.json`**, **the profile directory (or "no profile")**, any **base-branch commits** from step 0, and a compact triage digest (overall tier, review units, high-risk files with rule ids, notes). Do not pass a model or effort level: the agent definitions set them.
+Give each the same prompt: repo path, base, merge base, review id, **the paths of `$OUT/requirement.md` and `$OUT/criteria.json`**, **the profile directory (or "no profile")**, any **base-branch commits** from step 0, a compact triage digest (overall tier, review units, high-risk files with rule ids, notes), and **the path of `$OUT/executed-evidence.md` when step 1.5 imported one** (a lens may cite its `EX-` ids as evidence, with class `E1-executed`). Do not pass a model or effort level: the agent definitions set them.
 
 If the change has more than 3 review units, tell the lenses to cover units in tier order, T2 first, and to list any unit they did not get to under `not_checked`.
 
@@ -50,7 +55,7 @@ If the change has more than 3 review units, tell the lenses to cover units in ti
 1. Write each lens's JSON block **verbatim** to `$OUT/lenses/<lens>.json`. Never summarise or reformat lens output: the validator and the citation check need it as returned.
 2. Run `python3 <evidence-protocol base dir>/scripts/validate_lens_output.py $OUT/lenses/<each>.json --criteria $OUT/criteria.json --write` and save its report as `$OUT/validation.json`. It fixes wrong verdicts, turns blocking-on-E3 into abstentions and **blocking-on-non-binding criteria into notes plus api-owner questions**. Every violation goes into the dossier appendix.
 3. Run `python3 <evidence-protocol base dir>/scripts/check_citations.py` on the merged list and save `$OUT/citation-check.json`.
-4. Start `finding-verifier` with the validated lens files, `citation-check.json`, `criteria.json`, the repo, the merge base, the review id and the profile directory. Wait for it, and save its JSON verbatim to `$OUT/lenses/verifier.json`.
+4. Start `finding-verifier` with the validated lens files, `citation-check.json`, `criteria.json`, the repo, the merge base, the review id, the profile directory and, when imported, `$OUT/executed-evidence.json`. Wait for it, and save its JSON verbatim to `$OUT/lenses/verifier.json`.
 
 A lens that fails, or returns no JSON, counts as **not run**. Its topic goes into "What was not checked". For a blocking lens, the recommendation is at least T2 for every unit.
 
@@ -108,6 +113,8 @@ Also write `$OUT/dossier.json` with `review_id`, `requirement`, **`outcome`** (o
 
 The appendix lists every validator violation from `$OUT/validation.json` (count per lens): contract drift is measured, not hidden.
 
+When executed evidence was imported, `dossier.json` also gets `executed_evidence`: `{source, adapter, recorded_head, claims, reduced_confidence, fingerprints_sha256}` copied from `executed-evidence.json`. The dossier's "What was not checked" takes every `computed_not_checked` item, and its findings take every `computed_findings` item (lens `review-map`, class `E1-executed`, severity note unless a lens raises it with its own evidence).
+
 Record the review in the ledger:
 `python3 <sign-off base dir>/scripts/trust_ledger.py --repo <repo> record-review $OUT/dossier.json`
 
@@ -118,12 +125,13 @@ Record the review in the ledger:
 Rules:
 - **The 10-second test.** Someone opening the PR must get the main points without scrolling or clicking. Above the fold there are only four things: the header with tier, time and owner; **one** alert box of one or two plain sentences; the one-row glance table; the sign-off line. Everything else goes in `<details>` toggles.
 - **The glance table has exactly four cells, counts only:** 🔎 AI found (blocking · notes) · 🤚 AI refused to decide (n questions for you) · 👀 You read (lines of total, plus tests) · ⚠️ You accept (n known risks). No prose in the cells.
-- **Toggle order**, each `<summary>` with its icon and a count: 🤚 What the AI refused to decide, and why · 👀 Read these hunks · ⚠️ Residual risk you accept by signing · 🔎 What the AI found · ✅ What was checked, and by whom or what · 🚫 What was not checked, and why · 📋 Requirement trace · 🧩 The change in its own words · 🧪 Verifier log.
+- **Toggle order**, each `<summary>` with its icon and a count: 🤚 What the AI refused to decide, and why · 👀 Read these hunks · 🗺 The change as a pipeline (only with review-map evidence) · ⚠️ Residual risk you accept by signing · 🔎 What the AI found · ✅ What was checked, and by whom or what · 🚫 What was not checked, and why · 📋 Requirement trace · 🧩 The change in its own words · 🧪 Verifier log.
 - **"What was checked" is a bullet list, not a table:** `**Check:** result · by whom or what · evidence class`. One line each.
 - **Alert:** `> [!CAUTION]` for `NOT-FIX`, `BLOCK`, or an abstention backed by E1 evidence against a binding criterion; `> [!WARNING]` for T2; `> [!NOTE]` for T0/T1 with nothing decisive. Write it for someone who has not read the issue: say what not to do and why, with no ids or jargon.
 - **No score, gauge or percentage confidence.** Confidence is shown only as an evidence class (`E1 executed`, `E2 traced`, `E3 inferred`) and as counts anyone can check.
 - **Hunks are links** when the repo slug and head sha are known: `[TypeCollector.cs:1008](https://github.com/<slug>/blob/<sha>/<path>#L1008)`.
 - **Area trust comes from the ledger only** and goes in the footer. With no signed history, write `neutral (no signed history)`. Never invent a track record; mark seeded history `synthetic`.
+- **With imported review-map evidence:** "What was checked" lists each `EX-` claim first, as `**<what>:** <result> · review-map script · E1`. Add the toggle 🗺 **The change as a pipeline** right after "Read these hunks": the `pipeline.mermaid` text in a ```mermaid fence, the legend line, and under it "Drawn by the review-map agent. A picture, not evidence." Reduced-confidence notes go inside "What was checked", not on the first screen, unless they affect the alert's evidence. The footer adds `executed evidence: review-map, <n> files fingerprinted (SHA-256 in dossier.json)`.
 - Leave out the parts written for evaluators (holdout scorecards, lessons logs): they belong in `docs/`.
 - Stay under 60,000 characters (GitHub's comment limit is 65,536). If longer, cut the folded sections and link to `dossier.md`.
 
@@ -144,6 +152,7 @@ Template:
 
 <details><summary>🤚 <b>What the AI refused to decide, and why</b> (<n> questions)</summary> table: # · Question · Why the AI did not decide · Evidence that would settle it · Decider </details>
 <details><summary>👀 <b>Read these hunks</b> (<tier>)</summary> one bullet per unit: **U#** area · why (rule ids) · linked hunks </details>
+<details><summary>🗺 <b>The change as a pipeline</b></summary> only with review-map evidence: mermaid diagram, legend, "a picture, not evidence" </details>
 <details><summary>⚠️ <b>Residual risk you accept by signing</b> (<n>)</summary> plain sentences </details>
 <details><summary>🔎 <b>What the AI found</b> (<n> findings · <c> confirmed · <w> weakened · <b> blocking)</summary> table: Id · Lens · Severity · Finding · Where · Evidence · Verifier </details>
 <details><summary>✅ <b>What was checked, and by whom or what</b></summary> bullets </details>

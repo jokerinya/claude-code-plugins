@@ -1,0 +1,294 @@
+[
+  {
+    "id": "suppressed-valid-control",
+    "title": "Control: valid suppressed type with int keys should be unaffected and use the dynamic resolver",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Plain\n{\n    [Key(0)]\n    public int Id { get; set; }\n    [Key(1)]\n    public string Name { get; set; }\n}\n",
+    "model": [
+      {
+        "target": "App.Plain",
+        "exception": null,
+        "objects": [],
+        "closedGenerics": []
+      }
+    ],
+    "generatorException": null,
+    "generatorDiagnostics": [],
+    "analyzerDiagnostics": [],
+    "sourceErrors": [],
+    "generated": [],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": false,
+      "valuesIn": "Id=41; Name=forty-one",
+      "configs": [
+        {
+          "name": "default options",
+          "error": null,
+          "wire": "[41,\u0022forty-one\u0022]",
+          "byteCount": 12,
+          "valuesOut": "Id=41; Name=forty-one"
+        }
+      ]
+    }
+  },
+  {
+    "id": "suppressed-unkeyed-member",
+    "title": "Suppressed type with a public member lacking [Key] (the issue\u0027s missing-diagnostic case, MsgPack004)",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Loose\n{\n    [Key(0)]\n    public string Name { get; set; }\n    public int Unkeyed { get; set; }\n}\n",
+    "model": [
+      {
+        "target": "App.Loose",
+        "exception": null,
+        "objects": [],
+        "closedGenerics": []
+      }
+    ],
+    "generatorException": null,
+    "generatorDiagnostics": [],
+    "analyzerDiagnostics": [
+      {
+        "id": "MsgPack004",
+        "severity": "Error",
+        "message": "Properties and fields of MessagePackObject-attributed types require either KeyAttribute or IgnoreMemberAttribute: global::App.Loose.Unkeyed",
+        "location": "App.cs:8"
+      }
+    ],
+    "sourceErrors": [],
+    "generated": [],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": false,
+      "valuesIn": "Name=n; Unkeyed=9",
+      "configs": [
+        {
+          "name": "default options",
+          "error": "MessagePackDynamicObjectResolverException: all public members must mark KeyAttribute or IgnoreMemberAttribute. type:App.Loose member:Unkeyed",
+          "wire": null,
+          "byteCount": 0,
+          "valuesOut": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "suppressed-dup-int-keys",
+    "title": "Suppressed type with two properties sharing [Key(0)] (duplicate key, MsgPack005)",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Dup\n{\n    [Key(0)]\n    public string First { get; set; }\n    [Key(0)]\n    public string Second { get; set; }\n}\n",
+    "model": [
+      {
+        "target": "App.Dup",
+        "exception": null,
+        "objects": [],
+        "closedGenerics": []
+      }
+    ],
+    "generatorException": null,
+    "generatorDiagnostics": [],
+    "analyzerDiagnostics": [
+      {
+        "id": "MsgPack005",
+        "severity": "Error",
+        "message": "All KeyAttribute arguments must be unique",
+        "location": "App.cs:8"
+      }
+    ],
+    "sourceErrors": [],
+    "generated": [],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": false,
+      "valuesIn": "First=one; Second=two",
+      "configs": [
+        {
+          "name": "default options",
+          "error": "MessagePackDynamicObjectResolverException: key is duplicated, all members key must be unique. type:App.Dup member:Second",
+          "wire": null,
+          "byteCount": 0,
+          "valuesOut": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "generated-dup-string-keys-fields",
+    "title": "Normal generated type with duplicate string keys on public fields (field loop)",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject]\npublic class DupFields\n{\n    [Key(\u0022a\u0022)]\n    public string F1;\n    [Key(\u0022a\u0022)]\n    public int F2;\n}\n",
+    "model": [
+      {
+        "target": "App.DupFields",
+        "exception": "ArgumentException",
+        "objects": null,
+        "closedGenerics": null
+      }
+    ],
+    "generatorException": "ArgumentException",
+    "generatorDiagnostics": [
+      {
+        "id": "CS8785",
+        "severity": "Warning",
+        "message": "Generator \u0027MessagePackGenerator\u0027 failed to generate source. It will not contribute to the output and compilation errors may occur as a result. Exception was of type \u0027ArgumentException\u0027 with message \u0027An item with the same key has already been added. Key: a\u0027.",
+        "location": "(none)"
+      }
+    ],
+    "analyzerDiagnostics": [
+      {
+        "id": "MsgPack005",
+        "severity": "Error",
+        "message": "All KeyAttribute arguments must be unique",
+        "location": "App.cs:9"
+      },
+      {
+        "id": "AD0001",
+        "severity": "Warning",
+        "message": "Analyzer \u0027MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer\u0027 threw an exception of type \u0027System.ArgumentException\u0027 with message \u0027An item with the same key has already been added. Key: a\u0027.",
+        "location": "(none)"
+      }
+    ],
+    "sourceErrors": [],
+    "generated": [],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": false,
+      "valuesIn": "F1=left; F2=77",
+      "configs": [
+        {
+          "name": "default options",
+          "error": "MessagePackDynamicObjectResolverException: key is duplicated, all members key must be unique. type:App.DupFields member:F2",
+          "wire": null,
+          "byteCount": 0,
+          "valuesOut": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "mixed-keys-props-int-first",
+    "title": "Properties with an int key followed by a string key (mixed kinds, MsgPack005)",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject]\npublic class Mixed\n{\n    [Key(0)]\n    public string A { get; set; }\n    [Key(\u0022b\u0022)]\n    public string B { get; set; }\n}\n",
+    "model": [
+      {
+        "target": "App.Mixed",
+        "exception": null,
+        "objects": [
+          {
+            "type": "App.Mixed",
+            "members": [
+              "A (key 0, String)"
+            ]
+          }
+        ],
+        "closedGenerics": []
+      }
+    ],
+    "generatorException": null,
+    "generatorDiagnostics": [],
+    "analyzerDiagnostics": [
+      {
+        "id": "MsgPack005",
+        "severity": "Error",
+        "message": "All KeyAttribute arguments must be of the same type (either string or int)",
+        "location": "App.cs:8"
+      }
+    ],
+    "sourceErrors": [],
+    "generated": [
+      {
+        "hintName": "App.ProbeResolver.g.cs",
+        "text": "// \u003Cauto-generated /\u003E\r\n\r\n#pragma warning disable 618, 612, 414, 168, CS1591, SA1129, SA1309, SA1312, SA1403, SA1649\r\n\r\nusing MsgPack = global::MessagePack;\r\n\r\n[assembly: MsgPack::Internal.GeneratedAssemblyMessagePackResolverAttribute(typeof(App.ProbeResolver), 3, 0)]\r\n\r\nnamespace App {\r\n\r\n/// \u003Csummary\u003EA MessagePack resolver that uses generated formatters for types in this assembly.\u003C/summary\u003E\r\npartial class ProbeResolver : MsgPack::IFormatterResolver\r\n{\r\n\t/// \u003Csummary\u003EAn instance of this resolver that only returns formatters specifically generated for types in this assembly.\u003C/summary\u003E\r\n\tpublic static readonly MsgPack::IFormatterResolver Instance = new ProbeResolver();\r\n\r\n\tprivate ProbeResolver()\r\n\t{\r\n\t}\r\n\r\n\tpublic MsgPack::Formatters.IMessagePackFormatter\u003CT\u003E GetFormatter\u003CT\u003E()\r\n\t{\r\n\t\treturn FormatterCache\u003CT\u003E.Formatter;\r\n\t}\r\n\r\n\tprivate static class FormatterCache\u003CT\u003E\r\n\t{\r\n\t\tinternal static readonly MsgPack::Formatters.IMessagePackFormatter\u003CT\u003E Formatter;\r\n\r\n\t\tstatic FormatterCache()\r\n\t\t{\r\n\t\t\tvar f = ProbeResolverGetFormatterHelper.GetFormatter(typeof(T));\r\n\t\t\tif (f != null)\r\n\t\t\t{\r\n\t\t\t\tFormatter = (MsgPack::Formatters.IMessagePackFormatter\u003CT\u003E)f;\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n\r\n\tprivate static class ProbeResolverGetFormatterHelper\r\n\t{\r\n\t\tprivate static readonly global::System.Collections.Generic.Dictionary\u003Cglobal::System.Type, int\u003E closedTypeLookup = new global::System.Collections.Generic.Dictionary\u003Cglobal::System.Type, int\u003E(1)\r\n\t\t{\r\n\t\t\t{ typeof(global::App.Mixed), 0 },\r\n\t\t};\r\n\r\n\t\tinternal static object GetFormatter(global::System.Type t)\r\n\t\t{\r\n\t\t\tif (closedTypeLookup.TryGetValue(t, out int closedKey))\r\n\t\t\t{\r\n\t\t\t\tswitch (closedKey)\r\n\t\t\t\t{\r\n\t\t\t\t\tcase 0: return new global::App.ProbeResolver.App.MixedFormatter();\r\n\t\t\t\t\tdefault: return null; // unreachable\r\n\t\t\t\t};\r\n\t\t\t}\r\n\r\n\t\t\treturn null;\r\n\t\t}\r\n\t}\r\n}\r\n\r\n}\r\n"
+      },
+      {
+        "hintName": "Formatters.App.ProbeResolver.App.MixedFormatter.g.cs",
+        "text": "// \u003Cauto-generated /\u003E\r\n\r\n#pragma warning disable 618, 612, 414, 168, CS1591, SA1129, SA1309, SA1312, SA1403, SA1649\r\n\r\n#pragma warning disable CS8669 // We may leak nullable annotations into generated code.\r\n\r\nusing MsgPack = global::MessagePack;\r\n\r\nnamespace App {\r\npartial class ProbeResolver {\r\ninternal partial class App {\r\n\r\n\tinternal sealed class MixedFormatter : MsgPack::Formatters.IMessagePackFormatter\u003Cglobal::App.Mixed\u003E\r\n\t{\r\n\r\n\t\tpublic void Serialize(ref MsgPack::MessagePackWriter writer, global::App.Mixed value, MsgPack::MessagePackSerializerOptions options)\r\n\t\t{\r\n\t\t\tif (value == null)\r\n\t\t\t{\r\n\t\t\t\twriter.WriteNil();\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\r\n\t\t\tMsgPack::IFormatterResolver formatterResolver = options.Resolver;\r\n\t\t\twriter.WriteArrayHeader(1);\r\n\t\t\tMsgPack::FormatterResolverExtensions.GetFormatterWithVerify\u003Cstring\u003E(formatterResolver).Serialize(ref writer, value.A, options);\r\n\t\t}\r\n\r\n\t\tpublic global::App.Mixed Deserialize(ref MsgPack::MessagePackReader reader, MsgPack::MessagePackSerializerOptions options)\r\n\t\t{\r\n\t\t\tif (reader.TryReadNil())\r\n\t\t\t{\r\n\t\t\t\treturn null;\r\n\t\t\t}\r\n\r\n\t\t\toptions.Security.DepthStep(ref reader);\r\n\t\t\tMsgPack::IFormatterResolver formatterResolver = options.Resolver;\r\n\t\t\tvar length = reader.ReadArrayHeader();\r\n\t\t\tvar ____result = new global::App.Mixed();\r\n\r\n\t\t\tfor (int i = 0; i \u003C length; i\u002B\u002B)\r\n\t\t\t{\r\n\t\t\t\tswitch (i)\r\n\t\t\t\t{\r\n\t\t\t\t\tcase 0:\r\n\t\t\t\t\t\t____result.A = MsgPack::FormatterResolverExtensions.GetFormatterWithVerify\u003Cstring\u003E(formatterResolver).Deserialize(ref reader, options);\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tdefault:\r\n\t\t\t\t\t\treader.Skip();\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\treader.Depth--;\r\n\t\t\treturn ____result;\r\n\t\t}\r\n\t}\r\n}\r\n}\r\n}\r\n"
+      }
+    ],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": true,
+      "valuesIn": "A=alpha; B=beta",
+      "configs": [
+        {
+          "name": "default options",
+          "error": null,
+          "wire": "[\u0022alpha\u0022]",
+          "byteCount": 7,
+          "valuesOut": "A=alpha; B="
+        },
+        {
+          "name": "generated resolver first",
+          "error": null,
+          "wire": "[\u0022alpha\u0022]",
+          "byteCount": 7,
+          "valuesOut": "A=alpha; B="
+        }
+      ]
+    }
+  },
+  {
+    "id": "mixed-keys-fields-string-first",
+    "title": "Public fields with a string key first, then an int key (field loop, opposite order)",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject]\npublic class MixedFields\n{\n    [Key(\u0022x\u0022)]\n    public string X;\n    [Key(1)]\n    public int Y;\n}\n",
+    "model": [
+      {
+        "target": "App.MixedFields",
+        "exception": null,
+        "objects": [
+          {
+            "type": "App.MixedFields",
+            "members": [
+              "X (key \u0022x\u0022, String)"
+            ]
+          }
+        ],
+        "closedGenerics": []
+      }
+    ],
+    "generatorException": null,
+    "generatorDiagnostics": [],
+    "analyzerDiagnostics": [
+      {
+        "id": "MsgPack005",
+        "severity": "Error",
+        "message": "All KeyAttribute arguments must be of the same type (either string or int)",
+        "location": "App.cs:9"
+      }
+    ],
+    "sourceErrors": [],
+    "generated": [
+      {
+        "hintName": "App.ProbeResolver.g.cs",
+        "text": "// \u003Cauto-generated /\u003E\r\n\r\n#pragma warning disable 618, 612, 414, 168, CS1591, SA1129, SA1309, SA1312, SA1403, SA1649\r\n\r\nusing MsgPack = global::MessagePack;\r\n\r\n[assembly: MsgPack::Internal.GeneratedAssemblyMessagePackResolverAttribute(typeof(App.ProbeResolver), 3, 0)]\r\n\r\nnamespace App {\r\n\r\n/// \u003Csummary\u003EA MessagePack resolver that uses generated formatters for types in this assembly.\u003C/summary\u003E\r\npartial class ProbeResolver : MsgPack::IFormatterResolver\r\n{\r\n\t/// \u003Csummary\u003EAn instance of this resolver that only returns formatters specifically generated for types in this assembly.\u003C/summary\u003E\r\n\tpublic static readonly MsgPack::IFormatterResolver Instance = new ProbeResolver();\r\n\r\n\tprivate ProbeResolver()\r\n\t{\r\n\t}\r\n\r\n\tpublic MsgPack::Formatters.IMessagePackFormatter\u003CT\u003E GetFormatter\u003CT\u003E()\r\n\t{\r\n\t\treturn FormatterCache\u003CT\u003E.Formatter;\r\n\t}\r\n\r\n\tprivate static class FormatterCache\u003CT\u003E\r\n\t{\r\n\t\tinternal static readonly MsgPack::Formatters.IMessagePackFormatter\u003CT\u003E Formatter;\r\n\r\n\t\tstatic FormatterCache()\r\n\t\t{\r\n\t\t\tvar f = ProbeResolverGetFormatterHelper.GetFormatter(typeof(T));\r\n\t\t\tif (f != null)\r\n\t\t\t{\r\n\t\t\t\tFormatter = (MsgPack::Formatters.IMessagePackFormatter\u003CT\u003E)f;\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n\r\n\tprivate static class ProbeResolverGetFormatterHelper\r\n\t{\r\n\t\tprivate static readonly global::System.Collections.Generic.Dictionary\u003Cglobal::System.Type, int\u003E closedTypeLookup = new global::System.Collections.Generic.Dictionary\u003Cglobal::System.Type, int\u003E(1)\r\n\t\t{\r\n\t\t\t{ typeof(global::App.MixedFields), 0 },\r\n\t\t};\r\n\r\n\t\tinternal static object GetFormatter(global::System.Type t)\r\n\t\t{\r\n\t\t\tif (closedTypeLookup.TryGetValue(t, out int closedKey))\r\n\t\t\t{\r\n\t\t\t\tswitch (closedKey)\r\n\t\t\t\t{\r\n\t\t\t\t\tcase 0: return new global::App.ProbeResolver.App.MixedFieldsFormatter();\r\n\t\t\t\t\tdefault: return null; // unreachable\r\n\t\t\t\t};\r\n\t\t\t}\r\n\r\n\t\t\treturn null;\r\n\t\t}\r\n\t}\r\n}\r\n\r\n}\r\n"
+      },
+      {
+        "hintName": "Formatters.App.ProbeResolver.App.MixedFieldsFormatter.g.cs",
+        "text": "// \u003Cauto-generated /\u003E\r\n\r\n#pragma warning disable 618, 612, 414, 168, CS1591, SA1129, SA1309, SA1312, SA1403, SA1649\r\n\r\nusing MsgPack = global::MessagePack;\r\n\r\nnamespace App {\r\npartial class ProbeResolver {\r\ninternal partial class App {\r\n\tinternal sealed class MixedFieldsFormatter : global::MessagePack.Formatters.IMessagePackFormatter\u003Cglobal::App.MixedFields\u003E\r\n\t{\r\n\t\t// x\r\n\t\tprivate static global::System.ReadOnlySpan\u003Cbyte\u003E GetSpan_X() =\u003E new byte[1 \u002B 1] { 161, 120 };\r\n\r\n\t\tpublic void Serialize(ref global::MessagePack.MessagePackWriter writer, global::App.MixedFields value, global::MessagePack.MessagePackSerializerOptions options)\r\n\t\t{\r\n\t\t\tif (value is null)\r\n\t\t\t{\r\n\t\t\t\twriter.WriteNil();\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\r\n\t\t\tvar formatterResolver = options.Resolver;\r\n\t\t\twriter.WriteMapHeader(1);\r\n\t\t\twriter.WriteRaw(GetSpan_X());\r\n\t\t\tMsgPack::FormatterResolverExtensions.GetFormatterWithVerify\u003Cstring\u003E(formatterResolver).Serialize(ref writer, value.X, options);\r\n\t\t}\r\n\r\n\t\tpublic global::App.MixedFields Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)\r\n\t\t{\r\n\t\t\tif (reader.TryReadNil())\r\n\t\t\t{\r\n\t\t\t\treturn null;\r\n\t\t\t}\r\n\r\n\t\t\toptions.Security.DepthStep(ref reader);\r\n\t\t\tvar formatterResolver = options.Resolver;\r\n\t\t\tvar length = reader.ReadMapHeader();\r\n\t\t\tvar ____result = new global::App.MixedFields();\r\n\r\n\t\t\tfor (int i = 0; i \u003C length; i\u002B\u002B)\r\n\t\t\t{\r\n\t\t\t\tvar stringKey = global::MessagePack.Internal.CodeGenHelpers.ReadStringSpan(ref reader);\r\n\t\t\t\tswitch (stringKey.Length)\r\n\t\t\t\t{\r\n\t\t\t\t\tdefault:\r\n\t\t\t\t\tFAIL:\r\n\t\t\t\t\t  reader.Skip();\r\n\t\t\t\t\t  continue;\r\n\t\t\t\t\tcase 1:\r\n\t\t\t\t\t    if (stringKey[0] != 120) { goto FAIL; }\r\n\r\n\t\t\t\t\t    ____result.X = MsgPack::FormatterResolverExtensions.GetFormatterWithVerify\u003Cstring\u003E(formatterResolver).Deserialize(ref reader, options);\r\n\t\t\t\t\t    continue;\r\n\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\treader.Depth--;\r\n\t\t\treturn ____result;\r\n\t\t}\r\n\t}\r\n\r\n}\r\n}\r\n}\r\n"
+      }
+    ],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": true,
+      "valuesIn": "X=ex; Y=5",
+      "configs": [
+        {
+          "name": "default options",
+          "error": null,
+          "wire": "{\u0022x\u0022:\u0022ex\u0022}",
+          "byteCount": 6,
+          "valuesOut": "X=ex; Y=0"
+        },
+        {
+          "name": "generated resolver first",
+          "error": null,
+          "wire": "{\u0022x\u0022:\u0022ex\u0022}",
+          "byteCount": 6,
+          "valuesOut": "X=ex; Y=0"
+        }
+      ]
+    }
+  }
+]
