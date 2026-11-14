@@ -10,16 +10,31 @@ The shared home for the Agentlemen team's Claude Code plugins and skills. This r
 
 ## Getting the plugins
 
-**If the organisation has rolled this out through managed settings**, there's nothing to do. Claude Code registers the marketplace and enables the plugins at your next start. Run `/plugin` to check.
+The repo is **private** for now (it goes public when we submit for Junction 2026). Ask the repo owner to add your GitHub account as a collaborator first.
 
-**Manually**, in a Claude Code session:
+**One-time git setup** so Claude Code can clone a private repo:
+
+```bash
+gh auth login
+gh auth setup-git
+```
+
+**Install**, in a Claude Code session:
 
 ```
-/plugin marketplace add <your-org>/claude-code-plugins
+/plugin marketplace add jokerinya/claude-code-plugins
 /plugin install reviewer-tieto@agentlemen
 ```
 
-The repo is private, so your machine needs git access to the repository. If you clone over HTTPS, run `gh auth login` and then `gh auth setup-git` once.
+Run `/plugin` to check it's enabled. Then try it on the sample repo, see the [`reviewer-tieto` README](plugins/reviewer-tieto/).
+
+**Get updates:**
+
+```
+/plugin marketplace update agentlemen
+```
+
+**Report problems:** open a GitHub issue with the command you ran, the plugin version (from `/plugin`) and what went wrong.
 
 ## Layout
 
@@ -40,11 +55,11 @@ plugins/<plugin-name>/
    ```
 2. **New skill in an existing plugin:** add `plugins/<plugin>/skills/<skill-name>/SKILL.md` with `name` and `description` frontmatter. The description decides when Claude uses the skill, so say what it does and when to use it.
 3. **Check it:** run `claude plugin validate .` in the repo root, then try it with `claude --plugin-dir ./plugins/<name>`.
-4. **Open a PR.** After merge, people with auto-update get the change within a day; others run `/plugin marketplace update agentlemen`.
+4. **Bump the version** in the plugin's `plugin.json` (see Conventions), then **open a PR.** After merge, testers run `/plugin marketplace update agentlemen`.
 
 ## Conventions
 
-- **No `version` field** in `plugin.json` or the catalog. Installs follow the latest commit on `main`, so every merge is a release.
+- **`version` lives in `plugin.json` only** (semver, e.g. `0.1.0`), never in the catalog entry. Claude Code only ships an update to testers when this number changes, so **bump it on every change you want people to get**: patch for fixes, minor for new skills or behaviour.
 - **Never change a plugin's `name`.** It breaks existing installs. Change `displayName` instead, or add a `renames` entry to the catalog.
 - **No secrets, tokens or customer data.** Everything here is copied to every engineer's machine.
 - **Executables** go in a `scripts/` folder, never a top-level `bin/`, which claude.ai organisation sync rejects.
