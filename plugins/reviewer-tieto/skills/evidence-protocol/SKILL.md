@@ -68,6 +68,8 @@ Each abstention says: the question, why you did not decide, what evidence would 
 
 ## 7. Rules
 
+- **One simple command per call.** Use absolute paths. Never chain with `&&`, `;` or `|`, and never `cd` first: allow-lists match simple commands only.
+- **Use the criteria ids** from `criteria.json` when your task gives one. A blocking finding must rest on a `binding: true` or `derived` criterion, or on a defect that breaks users regardless of the requirement.
 - **Read only.** Never edit, create or delete files in the repo, and never commit, push or post. Allowed Bash: `git diff/log/show/status/merge-base/ls-files/grep`, `ls`, `cat`, `grep`, `rg`, `wc`, `gh issue view`, `gh pr view`, and the scripts the skills name.
 - Running tests is allowed **only** for the `finding-verifier` agent, and only in a temporary worktree (see `verify-findings`).
 - Report what you checked **and what you did not check**. "Not checked" is required, not optional.

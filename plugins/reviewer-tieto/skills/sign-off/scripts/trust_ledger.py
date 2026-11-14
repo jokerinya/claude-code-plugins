@@ -61,6 +61,20 @@ def parse_ts(s):
     return dt.datetime.fromisoformat(s)
 
 
+OUTCOMES = ["T0", "T1", "T2", "BLOCK", "NOT-FIX"]
+
+
+def outcome_of(text):
+    """Best-effort outcome from a free-text recommendation (older dossiers have no `outcome`)."""
+    t = (text if isinstance(text, str) else json.dumps(text or "")).upper()
+    for o in ("NOT-FIX", "BLOCK", "T2", "T1", "T0"):
+        if o in t:
+            return o
+    if "DO NOT MERGE" in t:
+        return "BLOCK"
+    return None
+
+
 # ---------- commands ----------
 
 def cmd_record_review(a):
@@ -71,6 +85,8 @@ def cmd_record_review(a):
         "type": "review", "ts": now(), "review_id": d["review_id"],
         "requirement": d.get("requirement", {}).get("id") if isinstance(d.get("requirement"), dict) else d.get("requirement"),
         "head": d.get("head"), "owner": d.get("owner"), "recommendation": d.get("recommendation"),
+        "outcome": d.get("outcome") or outcome_of(d.get("recommendation")),
+        "plugin_commit": d.get("plugin_commit") or (d.get("profile") or {}).get("plugin_commit") if isinstance(d.get("profile"), dict) else d.get("plugin_commit"),
         "units": [{"id": u.get("id"), "area": u.get("area"), "tier": u.get("tier"), "lines": u.get("lines")}
                   for u in d.get("units", [])],
         "findings": [{"id": x.get("id"), "lens": x.get("lens") or x.get("id", "").split("-")[0],
@@ -213,7 +229,18 @@ def metrics(events):
                       "median_owner_minutes": median([e.get("minutes") or 0 for e in part]),
                       "escapes_per_10_merges": None if not part else
                       round(10 * sum(o["review_id"] in ids for o in bad) / len(part), 2)})
+    # Consistency: the same change (requirement + head) reviewed more than once must get the same outcome.
+    by_change = {}
+    for e in events:
+        if e["type"] == "review":
+            key = (str(e.get("requirement")), str(e.get("head")))
+            by_change.setdefault(key, []).append(e.get("outcome") or outcome_of(e.get("recommendation")))
+    repeated = {k: v for k, v in by_change.items() if len(v) > 1}
+    consistent = sum(len(set(v)) == 1 for v in repeated.values())
     return {
+        "consistency": {"changes_reviewed_more_than_once": len(repeated), "same_outcome": consistent,
+                        "rate": pct(consistent, len(repeated)),
+                        "details": [{"requirement": k[0], "head": k[1], "outcomes": v} for k, v in repeated.items()]},
         "reviews": len(reviews), "signed": len(signs), "merged": len(merged),
         "unsigned_review_ids": [r for r in reviews if r not in sign_by],
         "share_routed_to_human_units": pct(len(routed), len(units)),
@@ -261,6 +288,7 @@ def cmd_metrics(a):
         ("AI misses found by humans", fmt(m["ai_misses_found_by_humans"])),
         ("Median hours review → sign-off", fmt(m["median_hours_review_to_signoff"])),
         ("Escapes per 10 merges", fmt(m["escapes_per_10_merges"])),
+        ("Same change, same outcome (repeat reviews)", f'{m["consistency"]["same_outcome"]}/{m["consistency"]["changes_reviewed_more_than_once"]}'),
     ]
     print("| Metric | Value |\n|---|---|")
     for k, v in rows:
@@ -273,6 +301,9 @@ def cmd_metrics(a):
     print("| Period | Merges | Median owner min | Escapes / 10 merges |\n|---|---|---|---|")
     for t in m["trend"]:
         print(f"| {t['period']} | {t['merges']} | {fmt(t['median_owner_minutes'])} | {fmt(t['escapes_per_10_merges'])} |")
+    for c in m["consistency"]["details"]:
+        flag = "consistent" if len(set(c["outcomes"])) == 1 else "INCONSISTENT"
+        print(f"\nRepeat reviews of {c['requirement']} @ {c['head']}: {' -> '.join(map(str, c['outcomes']))} ({flag})")
     if m["unsigned_review_ids"]:
         print(f"\nUnsigned reviews (nobody owns these yet): {', '.join(m['unsigned_review_ids'])}")
 
