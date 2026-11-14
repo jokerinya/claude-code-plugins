@@ -25,10 +25,11 @@ const files = [
   'adapters/messagepack/example-scenarios.json', 'adapters/messagepack/ReviewMapProbe.cs',
 ].map((f) => ({ from: f, to: `.review-map/${f}` }));
 files.push({ from: 'workflows/review-map.yml', to: '.github/workflows/review-map.yml' });
+files.push({ from: 'workflows/trust-sign-off.yml', to: '.github/workflows/trust-sign-off.yml' });
 // The reviewer-tieto plugin, so the workflow's dossier job can load it with --plugin-dir.
 const plugin = '../plugins/reviewer-tieto';
 for (const e of readdirSync(join(root, plugin), { recursive: true, withFileTypes: true })) {
-  if (!e.isFile() || e.name === '.DS_Store') continue;
+  if (!e.isFile() || e.name === '.DS_Store' || e.name.endsWith('.pyc')) continue;
   const rel = join(e.parentPath ?? e.path, e.name).slice(join(root, plugin).length + 1).split('\\').join('/');
   files.push({ from: `${plugin}/${rel}`, to: `.reviewer-tieto/${rel}` });
 }
