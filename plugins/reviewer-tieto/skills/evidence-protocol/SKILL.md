@@ -37,7 +37,7 @@ Confidence is **derived from the evidence class**. Never write "I am 90% sure".
 
 | Class | Meaning | Confidence |
 |---|---|---|
-| `E1-executed` | A command or test was run and its output is quoted | high |
+| `E1-executed` | A command or test was run and its output is quoted, by the verifier or by a recorded review-map run on the same commit (cited by its `EX-` id) | high |
 | `E2-traced` | The code path was read end to end; every step has a `path:line` citation with an exact quote | medium |
 | `E3-inferred` | Reasoning from partial reading, naming conventions or docs | low |
 
