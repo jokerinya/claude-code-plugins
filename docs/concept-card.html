@@ -1,0 +1,220 @@
+<title>Earned Trust Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: one column that reads like a review form. Recommendation and flow on top, the four reviewed changes as proof, paired panels below, a signature block as the one object with a border that matters. */
+:root {
+  --bg: #f3f6f7; --surface: #ffffff; --ink: #13212b; --muted: #556874; --line: #d3dce2;
+  --accent: #0a6b6b; --accent-soft: #e2f1f0; --stop: #a8281f; --stop-soft: #fbe9e7; --hold: #8a5a00; --hold-soft: #fbf1d9;
+  --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e151a; --surface: #162029; --ink: #e5edf1; --muted: #94a5b0; --line: #2b3944;
+  --accent: #56c6c2; --accent-soft: #12302f; --stop: #ff8f84; --stop-soft: #3a1a17; --hold: #e6b84a; --hold-soft: #33290f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e151a; --surface: #162029; --ink: #e5edf1; --muted: #94a5b0; --line: #2b3944;
+  --accent: #56c6c2; --accent-soft: #12302f; --stop: #ff8f84; --stop-soft: #3a1a17; --hold: #e6b84a; --hold-soft: #33290f; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55;
+  padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.page { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.08; letter-spacing: -0.01em; }
+h2 { font-size: 20px; }
+h3 { font-size: 15px; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+code, .tag { font-family: var(--mono); font-size: 0.86em; }
+.tag { display: inline-block; padding: 1px 7px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); font-weight: 600; white-space: nowrap; }
+.tag.stop { background: var(--stop-soft); color: var(--stop); }
+.tag.hold { background: var(--hold-soft); color: var(--hold); }
+
+header { display: flex; flex-direction: column; gap: 12px; }
+.lede { font-size: 18px; line-height: 1.5; max-width: 66ch; }
+.lede strong { color: var(--accent); font-weight: 600; }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; max-width: 820px; }
+.role { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.role h3 { font-size: 16px; }
+.role ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 16px; }
+.after { color: var(--muted); max-width: 66ch; }
+
+.flow { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; counter-reset: step; }
+.flow li { background: var(--surface); padding: 12px 11px; display: flex; flex-direction: column; gap: 4px; min-width: 0; counter-increment: step; flex: 1 1 170px; }
+@media (min-width: 1000px) { .flow { flex-wrap: nowrap; } .flow li { flex: 1 1 0; } }
+.flow li::before { content: counter(step); font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.flow b { font-family: var(--display); font-size: 15px; }
+.flow span { color: var(--muted); font-size: 13px; }
+.loop { color: var(--muted); font-size: 13px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px 36px; }
+section { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.wide { grid-column: 1 / -1; }
+ul.plain { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+ul.plain li { padding-left: 14px; border-left: 2px solid var(--line); }
+ul.plain b { font-weight: 600; }
+.gave { color: var(--muted); display: block; }
+
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--line); }
+th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+td:first-child { font-family: var(--display); font-weight: 600; white-space: nowrap; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.runs { min-width: 760px; }
+
+.proof { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.verdict { background: var(--stop-soft); color: var(--ink); border-left: 3px solid var(--stop); padding: 10px 14px; border-radius: 0 6px 6px 0; }
+.verdict b { color: var(--stop); }
+
+.sign { border: 1.5px solid var(--ink); border-radius: 4px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; background: var(--surface); }
+.sign ol, .sign ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.sign .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px 36px; }
+.sign .cols > div { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sigline { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: flex-end; margin-top: 6px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.sigline span { flex: 1 1 180px; border-top: 1px solid var(--ink); padding-top: 5px; }
+.not { color: var(--stop); font-weight: 600; }
+
+footer { border-top: 1px solid var(--line); padding-top: 14px; color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+</style>
+
+<div class="page">
+
+<header>
+  <span class="label">Concept card · Junction 2026 · Tieto challenge "Earned Trust in AI Code" · Team Agentlemen</span>
+  <h1>Earned Trust Review</h1>
+  <p class="lede">Stop asking a human to read every line an agent wrote. Give each change a <strong>Trust Dossier</strong>.</p>
+  <div class="roles">
+    <div class="role">
+      <h3>🤖 The AI</h3>
+      <ul>
+        <li>Runs the change and reads everything, and proves what it claims</li>
+        <li>Says what it refused to decide and what it did not check</li>
+        <li>Points to the few hunks that carry the risk</li>
+      </ul>
+    </div>
+    <div class="role">
+      <h3>👤 A named engineer</h3>
+      <ul>
+        <li>Reads those hunks</li>
+        <li>Answers the open questions</li>
+        <li>Signs for the risk that remains. No signature, no merge</li>
+      </ul>
+    </div>
+  </div>
+  <p class="after">How much the engineer must read depends on rules and on each code area's track record. For the people using it there are three steps: a pull request opens, the review posts the dossier, the owner signs.</p>
+</header>
+
+<section>
+  <span class="label">How a change moves through review · one pipeline, one comment</span>
+  <ol class="flow">
+    <li><b>Requirement</b><span>Fetched with its source. Only the issue author and maintainers can set binding criteria.</span></li>
+    <li><b>Evidence run</b><span>The change is built and run on real inputs, before and after, on a machine with no secrets.</span></li>
+    <li><b>Risk triage</b><span>Named rules give each unit a tier: T0, T1 or T2.</span></li>
+    <li><b>Six lenses</b><span>Intent, correctness, security, compatibility, docs, verifiability. In parallel.</span></li>
+    <li><b>Verifier</b><span>Tries to refute every claim. Checks each quoted line against the code.</span></li>
+    <li><b>Trust Dossier</b><span>One comment, readable in 10 seconds. A summary goes in the PR description.</span></li>
+    <li><b>👤 Owner signs</b><span>With a comment on the PR. The merge is blocked until then.</span></li>
+    <li><b>Ledger</b><span>Reviews, sign-offs and later outcomes: reverts, incidents, escapes.</span></li>
+  </ol>
+  <p class="loop">👤 marks the one step a human does. The AI and scripts do the rest.</p>
+  <p class="loop">The ledger feeds step 3. An area with a clean record earns a lighter tier. One escape withdraws it.</p>
+</section>
+
+<div class="grid">
+
+<section class="wide">
+  <span class="label">Shown on the four agent-written sample changes · each with its requirement ID</span>
+  <div class="proof">
+    <h3>Every test passes on all four changes. The review gave three different verdicts.</h3>
+    <div class="scroll">
+    <table class="runs">
+      <thead><tr><th>Requirement</th><th>Verdict</th><th>What the dossier told the owner</th><th>Refused to decide</th><th>Owner reads</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://github.com/jokerinya/junction26-messagepack-csharp/pull/1">#2234</a></td><td><span class="tag stop">NOT-FIX</span></td><td>The patch fixes a different, older crash, not the reported bug.</td><td class="num">4 questions</td><td class="num">36 of 266 lines · 14%</td></tr>
+        <tr><td><a href="https://github.com/jokerinya/junction26-messagepack-csharp/pull/2">#2283</a></td><td><span class="tag">T1</span></td><td>The crash is fixed, but the fix now also hides some real errors.</td><td class="num">6 questions</td><td class="num">39 of 228 lines · 17%</td></tr>
+        <tr><td><a href="https://github.com/jokerinya/junction26-messagepack-csharp/pull/3">#2129</a></td><td><span class="tag stop">BLOCK</span></td><td>The generated code ignores attributes the maintainer asked it to respect.</td><td class="num">7 questions</td><td class="num">310 of 1,043 lines · 30%</td></tr>
+        <tr><td><a href="https://github.com/jokerinya/junction26-messagepack-csharp/pull/4">#2297</a></td><td><span class="tag">T1</span></td><td>237 files, 223 of them low-risk snapshots. One open decision on older .NET targets.</td><td class="num">5 questions</td><td class="num">52 of 1,494 lines · 3.5%</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>Each row links to a real pull request with its dossier. The pipeline took 15 to 18 minutes per change.</p>
+    <p><b>How trust is measured:</b> from a ledger of reviews, sign-offs and later outcomes, not from review activity. The bar is that owner minutes fall while reverts and incidents do not rise. Measured so far: the share of lines the owner must read, 3.5% to 30%.</p>
+  </div>
+</section>
+
+<section class="wide">
+  <h2>Principles: how we balance the five tensions</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Tension</th><th>Our rule</th><th>How it is enforced</th></tr></thead>
+    <tbody>
+      <tr><td>Risk</td><td>Depth of human reading follows risk, by rules a person can read.</td><td>Every tier names its rule id. The model may raise a tier, never lower it.</td></tr>
+      <tr><td>Hallucination</td><td>The AI checks the AI, and scripts check both.</td><td>A script compares every quoted <code>path:line</code> with the code. A verifier tries to refute each finding. From the evidence run, only what scripts measured is used, never an agent's own summary.</td></tr>
+      <tr><td>Transparency</td><td>Say what was not done, as clearly as what was.</td><td>Fixed sections: what was not checked and why, what the AI refused to decide and who decides.</td></tr>
+      <tr><td>Confidence</td><td>Confidence is the kind of evidence, never a score.</td><td><span class="tag">E1</span> executed, <span class="tag">E2</span> traced with checked citations, <span class="tag hold">E3</span> inferred. A blocking finding needs E2 or better.</td></tr>
+      <tr><td>Quality</td><td>Tests must prove the change, not just exist.</td><td>New tests are run without the change; those that still pass are flagged. Changed lines that no run reached are listed.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Above all of these: <b>the AI gives advice with evidence, never approval.</b> No output says "approved". The merge stays blocked until the named owner signs. The owner can overrule the AI, but has to say why.</p>
+</section>
+
+<section>
+  <h2>Trade-offs we chose</h2>
+  <ul class="plain">
+    <li><b>A human signature blocks every merge.</b><span class="gave">Gave up: auto-merge speed. Each change waits 15 to 18 minutes for the review, then for a person.</span></li>
+    <li><b>Evidence class instead of a confidence score.</b><span class="gave">Gave up: some real bugs arrive as questions, because a blocker needs E2 or better.</span></li>
+    <li><b>Rules decide the tier; the model can only raise it.</b><span class="gave">Gave up: precision. Rules are coarse, so the owner still read 3.5% to 30% of the changed lines.</span></li>
+    <li><b>Run the change, and verify every claim.</b><span class="gave">Gave up: cost. A build, runs before and after, six lenses and a verifier per change. We have not measured the price per review.</span></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Limits</h2>
+  <ul class="plain">
+    <li><b>A reference implementation, not a product.</b> It knows one codebase, a C# library. No frontend sample yet.</li>
+    <li><b>Nothing runs on the reported version.</b> On #2234 the headline rests on reading the version history (E2), not on a run.</li>
+    <li><b>Trust needs history.</b> The ledger holds four reviews and no outcomes yet, so every area is still neutral.</li>
+    <li><b>The AI is not independent of itself.</b> The lenses and the verifier are one model family, and the reviewing agent runs unattended with an API key.</li>
+  </ul>
+</section>
+
+<section class="wide">
+  <h2>What the owner signs</h2>
+  <div class="sign">
+    <div class="cols">
+      <div>
+        <ol>
+          <li>What was checked, and by whom or what</li>
+          <li>What was not checked, and why</li>
+          <li>The residual risk they accept</li>
+        </ol>
+      </div>
+      <div>
+        <p>With a comment on the pull request: <code>/sign-off accept</code> or <code>/sign-off reject</code>.</p>
+        <ul>
+          <li>Only the engineer assigned to the PR can sign.</li>
+          <li>The signature covers one commit. A new push needs a new review.</li>
+          <li>Accepting a BLOCK or NOT-FIX needs a written reason.</li>
+          <li>Signing unlocks the merge. It does not merge.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="sigline"><span>Named engineer</span><span>Decision · date · minutes spent</span></div>
+    <p><span class="not">Not accepted:</span> "the AI said it was fine", an unsigned merge, confidence without evidence, a tier nobody can explain.</p>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <span>Reference implementation: the <code>reviewer-tieto</code> plugin 0.4.1 for Claude Code, the <code>review-map</code> evidence tool, and two GitHub Actions workflows</span>
+  <span>Sample data: public open-source changes from the challenge repo</span>
+  <span>Failure modes and lessons: <code>docs/lessons-log.md</code> · Decisions: <code>docs/decision-log.md</code></span>
+</footer>
+
+</div>
