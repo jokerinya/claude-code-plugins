@@ -10,6 +10,12 @@ The shared home for the Agentlemen team's Claude Code plugins and skills. This r
 
 Also here, not a plugin: [`review-map/`](review-map/), a Node tool and GitHub Actions workflow that runs an agent-written change on real inputs before and after, and records the evidence. `reviewer-tieto` imports its measurements as executed evidence.
 
+## The concept
+
+- [Concept card](docs/concept-card.html): the recommendation, principles, trade-offs and limits of Earned Trust Review, with the four sample changes as proof. Also published as a page: https://claude.ai/artifact/EigNvRszsCtW5wbXrHSg18
+- [Lessons log](docs/lessons-log.md): the failure modes we saw, what we changed, and what we learned.
+- [Decision log](docs/decision-log.md): every decision, why, and what it cost.
+
 ## Getting the plugins
 
 The repo is **private** for now (it goes public when we submit for Junction 2026). Ask the repo owner to add your GitHub account as a collaborator first.
