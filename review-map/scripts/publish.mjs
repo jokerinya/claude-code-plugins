@@ -2,11 +2,12 @@
 // Publishes the reviewer into a branch of the target repository through the GitHub API (no git push):
 //   review-map/<files>            -> .review-map/<files>
 //   review-map/workflows/*.yml    -> .github/workflows/*.yml
+//   plugins/reviewer-tieto/<files> -> .reviewer-tieto/<files>
 // Usage: node scripts/publish.mjs <owner/repo> <branch>
 
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -24,6 +25,13 @@ const files = [
   'adapters/messagepack/example-scenarios.json', 'adapters/messagepack/ReviewMapProbe.cs',
 ].map((f) => ({ from: f, to: `.review-map/${f}` }));
 files.push({ from: 'workflows/review-map.yml', to: '.github/workflows/review-map.yml' });
+// The reviewer-tieto plugin, so the workflow's dossier job can load it with --plugin-dir.
+const plugin = '../plugins/reviewer-tieto';
+for (const e of readdirSync(join(root, plugin), { recursive: true, withFileTypes: true })) {
+  if (!e.isFile() || e.name === '.DS_Store') continue;
+  const rel = join(e.parentPath ?? e.path, e.name).slice(join(root, plugin).length + 1).split('\\').join('/');
+  files.push({ from: `${plugin}/${rel}`, to: `.reviewer-tieto/${rel}` });
+}
 
 // Each call is retried with backoff: one dropped connection should not fail the whole publish.
 // Nothing changes on GitHub until the final ref update, so a failed publish leaves the branch as it was.
@@ -60,7 +68,7 @@ if (newTree.sha === parent.tree.sha) {
   process.exit(0);
 }
 const commit = api('POST', `repos/${slug}/git/commits`, {
-  message: 'Add review-map reviewer and workflow\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>',
+  message: 'Update the Earned Trust Review workflow, review-map and reviewer-tieto',
   tree: newTree.sha,
   parents: [ref.object.sha],
 });
