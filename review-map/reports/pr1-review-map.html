@@ -1,0 +1,491 @@
+<title>PR 1 Review Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one reading column; a challenge scorecard up top, then one section per challenge item, each ending in a trust verdict. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --fg: #151a22;
+  --muted: #5a6372;
+  --line: #dde1e8;
+  --accent: #2b55c8;
+  --computed: #11745a;
+  --computed-bg: #e3f3ed;
+  --gated: #9a6200;
+  --gated-bg: #fbf0db;
+  --stated: #5d6676;
+  --stated-bg: #eceef2;
+  --risk: #b0262f;
+  --risk-bg: #fbe7e8;
+  --code-bg: #eef1f6;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1318; --surface: #161b22; --fg: #e6e9ee; --muted: #9aa3b2; --line: #2a313b; --accent: #7d9bff;
+    --computed: #4cc79c; --computed-bg: #12302a; --gated: #e3a942; --gated-bg: #352812; --stated: #a4adbb; --stated-bg: #232933;
+    --risk: #f2737b; --risk-bg: #3a1a1d; --code-bg: #1d232c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1318; --surface: #161b22; --fg: #e6e9ee; --muted: #9aa3b2; --line: #2a313b; --accent: #7d9bff;
+  --computed: #4cc79c; --computed-bg: #12302a; --gated: #e3a942; --gated-bg: #352812; --stated: #a4adbb; --stated-bg: #232933;
+  --risk: #f2737b; --risk-bg: #3a1a1d; --code-bg: #1d232c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 72px;
+}
+.wrap { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.75rem; font-weight: 700; }
+h3 { font-size: 1.15rem; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+code { background: var(--code-bg); padding: 0.08em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.stack-lg { display: flex; flex-direction: column; gap: 24px; }
+.muted { color: var(--muted); }
+
+/* header */
+header .stack { gap: 16px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 0.92rem; color: var(--muted); }
+.meta span strong { color: var(--fg); font-weight: 500; }
+.lede { font-size: 1.12rem; }
+
+/* trust legend + badges */
+.legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.legend > div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; white-space: nowrap; width: fit-content; }
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.b-computed { color: var(--computed); background: var(--computed-bg); }
+.b-gated { color: var(--gated); background: var(--gated-bg); }
+.b-stated { color: var(--stated); background: var(--stated-bg); }
+.b-risk { color: var(--risk); background: var(--risk-bg); }
+
+/* scorecard */
+.score { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.score a { text-decoration: none; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.score a:hover { border-color: var(--accent); }
+.score .num { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+.score .t { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; line-height: 1.25; }
+.meter { display: flex; gap: 3px; }
+.meter i { flex: 1; height: 6px; border-radius: 2px; background: var(--line); }
+.meter i.on { background: var(--computed); }
+.meter.mid i.on { background: var(--gated); }
+.score .why { font-size: 0.9rem; color: var(--muted); }
+
+/* sections */
+section { display: flex; flex-direction: column; gap: 20px; scroll-margin-top: 24px; }
+.sec-head { display: flex; flex-direction: column; gap: 6px; border-top: 2px solid var(--fg); padding-top: 14px; }
+.challenge { font-size: 0.95rem; color: var(--muted); font-style: italic; max-width: 72ch; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.cols > * { min-width: 0; }
+ul.clean { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 6px; }
+ul.clean li { max-width: 72ch; }
+
+/* tables */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--font-mono); font-size: 0.74rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: none; }
+td.nowrap { white-space: nowrap; }
+.tabnum { font-variant-numeric: tabular-nums; }
+
+/* evidence lines (quoted by the script) */
+.ev { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
+.ev span { overflow-wrap: anywhere; }
+.ev b { color: var(--fg); font-weight: 500; }
+
+/* items */
+.item { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: start; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.item:last-child { border-bottom: none; }
+.item > div { min-width: 0; }
+.sev { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 4px; margin-top: 3px; white-space: nowrap; }
+.sev.warn { color: var(--risk); background: var(--risk-bg); }
+.sev.imp { color: var(--accent); background: var(--code-bg); }
+.sev.note { color: var(--stated); background: var(--stated-bg); }
+.sev.intent, .sev.oor { color: var(--gated); background: var(--gated-bg); }
+.kv { display: grid; grid-template-columns: 140px 1fr; gap: 4px 12px; font-size: 0.92rem; margin-top: 8px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; }
+
+/* trust verdict box */
+.verdict { border-left: 4px solid var(--computed); background: var(--surface); border-radius: 0 8px 8px 0; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.verdict.mid { border-left-color: var(--gated); }
+.verdict .vt { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.verdict .vt strong { font-family: var(--font-display); font-size: 1.05rem; }
+
+/* stat row */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.stat .n { font-family: var(--font-display); font-weight: 700; font-size: 1.9rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat .l { font-size: 0.86rem; color: var(--muted); }
+
+/* flow */
+.flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.flow > div { padding: 14px 16px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.flow > div:last-child { border-right: none; }
+.flow .step { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.flow .h { font-family: var(--font-display); font-weight: 600; }
+.flow p { font-size: 0.88rem; }
+
+/* trace */
+.trace { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.hop { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; background: var(--surface); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.hop.cause { border-color: var(--gated); background: var(--gated-bg); }
+.hop .hn { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+.hop .hv { font-family: var(--font-mono); font-size: 0.8rem; overflow-wrap: anywhere; }
+
+/* log */
+.log td:first-child { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+details { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 12px 16px; }
+details > summary { cursor: pointer; font-weight: 500; }
+details[open] > summary { margin-bottom: 10px; }
+footer { font-size: 0.86rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; display: flex; flex-direction: column; gap: 6px; }
+
+@media (max-width: 560px) {
+  body { padding-block: 24px 48px; }
+  .kv { grid-template-columns: 1fr; }
+  .kv dt { margin-top: 6px; }
+  .flow > div { border-right: none; border-bottom: 1px solid var(--line); }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="stack">
+    <span class="eyebrow">Junction 2026 · AI review of AI-written code · reference run</span>
+    <h1>Review map for PR 1</h1>
+    <p class="lede">How the review-map concept handles one agent-written change: branch <code>ju26-issue-2283</code>, written to fix upstream issue <code>MessagePack-CSharp#2283</code>. For each of the six things the challenge asks for, this page shows what review-map did on PR 1 and how far you can trust it.</p>
+    <div class="meta">
+      <span>Change <strong><a href="https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/pull/1">PR 1 on the fork</a></strong></span>
+      <span>Comment <strong><a href="https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/pull/1#issuecomment-6875301048">the review map</a></strong></span>
+      <span>Head <strong class="mono">9df83c38</strong> against <strong class="mono">32258fdb</strong></span>
+      <span>Requirement <strong class="mono">MessagePack-CSharp#2283</strong></span>
+    </div>
+  </div>
+</header>
+
+<section aria-labelledby="trust-scale">
+  <div class="stack">
+    <span class="eyebrow">How to read the trust ratings</span>
+    <h2 id="trust-scale">Where each statement comes from</h2>
+    <p>Every statement in a review map has one of three origins. The ratings on this page count how much of each answer rests on the stronger kinds.</p>
+  </div>
+  <div class="legend">
+    <div><span class="badge b-computed">Computed</span><p>Copied from the recorded runs by a script: test outcomes, coverage, the values at each hand-off. The reviewing agent cannot word these.</p></div>
+    <div><span class="badge b-gated">Gated</span><p>Words written by the reviewer, where every cited run, test or code line was looked up by the script and quoted next to the words. A pointer that doesn't hold moves the item out.</p></div>
+    <div><span class="badge b-stated">Stated</span><p>Prose nothing checks: the reviewer's explanation, or a number typed inside a sentence. Read it as opinion.</p></div>
+  </div>
+</section>
+
+<section aria-labelledby="scorecard">
+  <div class="stack">
+    <span class="eyebrow">Summary</span>
+    <h2 id="scorecard">The six asks, scored on PR 1</h2>
+  </div>
+  <div class="score">
+    <a href="#c1"><span class="num">Ask 1</span><span class="t">Define the concept</span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="why">Concept built and run on PR 1 and PR 2. PRs 3 and 4 not reviewed yet.</span></a>
+    <a href="#c2"><span class="num">Ask 2</span><span class="t">Key principles and the balance</span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="why">Each principle is enforced by code and covered by 5 tests. One rule can still be gamed.</span></a>
+    <a href="#c3"><span class="num">Ask 3</span><span class="t">One sample change with its requirement ID</span><span class="meter mid"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span><span class="why">Runs are real, but PR 1's analysis was written by hand and built on a newer SDK than the repo pins.</span></a>
+    <a href="#c4"><span class="num">Ask 4</span><span class="t">What it found, refused to decide, and why</span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="why">5 found, 3 refused, every pointer resolved. Decisions have no named owner yet.</span></a>
+    <a href="#c5"><span class="num">Ask 5</span><span class="t">Accept without a full read</span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="why">Tests, coverage, a known-break check and per-line builds all computed; the reading list now follows from them. NativeAOT and the IDE case are still out of reach.</span></a>
+    <a href="#c6"><span class="num">Ask 6</span><span class="t">Failure modes and decision log</span><span class="meter mid"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span><span class="why">Logged honestly, including a mistake in our own write-up that the per-line builds caught, and three things another reviewer caught.</span></a>
+  </div>
+  <p class="muted">Meter: five bars, filled by how much of the answer rests on computed or gated evidence and how much was actually exercised on PR 1. Green means mostly computed; amber means a real part is stated or untested.</p>
+</section>
+
+<!-- ============================================================ 1 -->
+<section id="c1" aria-labelledby="c1h">
+  <div class="sec-head">
+    <span class="eyebrow">Ask 1</span>
+    <h2 id="c1h">The concept: run the change, show the evidence, leave the decisions to a named human</h2>
+    <p class="challenge">“Define the concept: what your team recommends the PR review factory should follow.”</p>
+  </div>
+  <p>Review-map treats a pull request as a change to a pipeline, not a pile of lines. A reviewing agent that did not write the change picks real inputs. Those inputs run through the real pipeline twice, on the code before and after the change, and every hand-off between stages is recorded. The human then reads three short lists and the evidence behind them, instead of every line.</p>
+  <div class="flow" role="list">
+    <div role="listitem"><span class="step">Step 1 · plan</span><span class="h">Choose inputs</span><p>The agent reads the diff and the issue, splits the issue into requirements, picks inputs and predicts how the bug will show.</p></div>
+    <div role="listitem"><span class="step">Step 2 · evidence</span><span class="h">Run before and after</span><p>Each input goes through the real generator, analyzer and serializer on both sides, plus the repo's tests with coverage.</p></div>
+    <div role="listitem"><span class="step">Step 3 · analyze</span><span class="h">Explain with pointers</span><p>The agent writes findings, decisions and gaps, each pointing at a run, a test or a code line. A script checks every pointer.</p></div>
+    <div role="listitem"><span class="step">Step 4 · post</span><span class="h">One PR comment</span><p>Found, refused to decide, not checked, then the requirement table, the pipeline map and one trace per input.</p></div>
+  </div>
+  <p>The answer to “is line-by-line review still right?”: for agent-written changes, mostly no. What a reviewer needs is what each unit receives and emits, and which change causes which effect, shown with real data. Line reading is kept for the few hunks the evidence cannot settle.</p>
+  <div class="verdict">
+    <div class="vt"><strong>Trust: high for the concept, partial coverage</strong><span class="badge b-computed">Built and run</span></div>
+    <p>The full pipeline runs in GitHub Actions on the fork and posted PR 2's review automatically. PR 1's review uses the same runs and gate, but its write-up was done by hand (see Ask 3). Branches 2129 and 2297, the two larger changes, have not been reviewed, so the concept is untested on a 237-file change.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 2 -->
+<section id="c2" aria-labelledby="c2h">
+  <div class="sec-head">
+    <span class="eyebrow">Ask 2</span>
+    <h2 id="c2h">Key principles, and how they balance risk, hallucination, transparency, confidence and quality</h2>
+    <p class="challenge">“State its key principles, including how it balances risk, hallucination, transparency, confidence and quality.”</p>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Principle</th><th>How review-map enforces it</th><th>What it balances</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Run it, don't just read it</strong></td><td>A probe compiles each input with Roslyn and records the model, diagnostics, generated C# and a real serialize round trip, before and after.</td><td>Quality, confidence</td></tr>
+        <tr><td><strong>The agent points, the script quotes</strong></td><td>The agent's output schema has no field for evidence values. It writes pointers such as <code>run:issue-repro:model:both:differs</code>; the script fills in the values. A pointer that does not exist, or shows the opposite, moves the item to “Not backed by the evidence”.</td><td>Hallucination, transparency</td></tr>
+        <tr><td><strong>Facts, decisions and gaps stay apart</strong></td><td>Three typed lists with fixed fields. A refusal must use one of four reasons: <code>intent</code>, <code>trade-off</code>, <code>unreproduced</code>, <code>out-of-reach</code>.</td><td>Transparency, risk</td></tr>
+        <tr><td><strong>Rules decide what the AI must not</strong></td><td>Only a run or a test can make a finding a WARNING. If the issue's symptom does not show on the old code, or is still there on the new code, the script refuses a “fixed” verdict and opens a decision.</td><td>Hallucination, confidence</td></tr>
+        <tr><td><strong>Show which part causes which effect</strong></td><td>The PR is rebuilt with each changed part removed, and every input runs through each build. Where removing a part brings the old value back, that part causes the effect. Parts that depend on each other are grouped using the compiler's own errors.</td><td>Hallucination, confidence</td></tr>
+        <tr><td><strong>Prove the probe can see a break</strong></td><td>A fixed, known-bad change (TypeCollector drops a member) runs through the same inputs. On PR 1 it showed in 4 of 4 inputs, so “no difference” means something.</td><td>Confidence</td></tr>
+        <tr><td><strong>Say what wasn't checked</strong></td><td>Changed lines no test ran, requirements no input covers, and test projects not run are added by the script. A wrong SDK or a fallback run shows as reduced confidence at the top.</td><td>Risk, transparency</td></tr>
+        <tr><td><strong>Anyone can re-check</strong></td><td>Each finding prints a <code>replay</code> command; the footer carries SHA-256 fingerprints of every evidence file.</td><td>Transparency</td></tr>
+        <tr><td><strong>The change cannot review itself</strong></td><td>PR code runs only in a job with no secrets; the reviewer is checked out from the base branch; the AI never approves, and decisions go to a person a human named.</td><td>Risk (security)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="verdict">
+    <div class="vt"><strong>Trust: high, with one known gap</strong><span class="badge b-computed">Enforced in code</span><span class="badge b-gated">5 tests</span></div>
+    <p>Each principle is code, not policy text, and the gate is tested against six planted mistakes (a missing pointer, a wrong direction, a scenario that never ran, “all 170 tests passed”, a wrong test outcome, a malformed pointer). All six are caught. The gap: the agent chooses which symptom counts as the bug. On PR 2 it predicted the very crash the PR fixes, so the rule passed. The prediction is still made before anything runs, but its content is the agent's choice.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 3 -->
+<section id="c3" aria-labelledby="c3h">
+  <div class="sec-head">
+    <span class="eyebrow">Ask 3</span>
+    <h2 id="c3h">The reference: PR 1, requirement MessagePack-CSharp#2283</h2>
+    <p class="challenge">“Illustrate it as a reference, on one sample agent-written change with its requirement ID.”</p>
+  </div>
+  <div class="cols">
+    <div class="panel">
+      <h3>The change</h3>
+      <p>One agent-written commit on <code>ju26-issue-2283</code>, 4 files. The issue: the MessagePack source generator and analyzer crash with <code>IndexOutOfRangeException</code> when a member's type is a closed generic struct from a referenced assembly.</p>
+      <p>The PR does two things: two null-safe lookups (the crash fix), and a new filter that drops every diagnostic located outside the project being compiled.</p>
+    </div>
+    <div class="panel">
+      <h3>What was run</h3>
+      <ul class="clean">
+        <li>4 inputs: the issue's repro, a referenced generic struct and a referenced generic class with an unkeyed member, and the same type declared in-project as a control.</li>
+        <li>Each input on the code before and after the PR, and on 4 more builds of the PR with one part removed (lines 239, 985, 1077, and the filter group).</li>
+        <li><code>MessagePack.SourceGenerator.Tests</code> on both sides, with code coverage on the after side.</li>
+        <li>The known-break run on all 4 inputs.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Technology, by layer</h3>
+    <div class="cols">
+      <div class="stack"><span class="eyebrow">Frontend</span><p>One GitHub PR comment in plain Markdown: Mermaid diagrams for the pipeline and each input's trace, folded tables for the full values, links into the code at the reviewed commit. Nothing to install for the reader.</p></div>
+      <div class="stack"><span class="eyebrow">Backend</span><p>GitHub Actions with three jobs. Node orchestrates; an xUnit probe drives Roslyn and the serializer; Claude (Sonnet 5.5 by default) via structured outputs; a repo adapter holds everything specific to MessagePack.</p></div>
+      <div class="stack"><span class="eyebrow">Security</span><p>PR code runs only in the job without the API key; the reviewer comes from the base branch, so a PR cannot change its own reviewer; the comment never links upstream issues and only mentions people a human named.</p></div>
+    </div>
+  </div>
+  <div class="verdict mid">
+    <div class="vt"><strong>Trust: medium-high</strong><span class="badge b-computed">Runs</span><span class="badge b-risk">2 caveats</span></div>
+    <p>The recordings are real and reproducible: re-running the evidence matched the earlier recording at every hand-off. Two things lower the rating. First, PR 1's write-up was done by hand, then put through the same gate and rules as the automated path; its requirements were written after the runs, so they are not a prediction, and the comment says so. Second, the runs used .NET SDK 9.0.301 while the repo pins 8.0.402; the comment shows this as reduced confidence at the top.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 4 -->
+<section id="c4" aria-labelledby="c4h">
+  <div class="sec-head">
+    <span class="eyebrow">Ask 4</span>
+    <h2 id="c4h">What it found, what it refused to decide, and why</h2>
+    <p class="challenge">“Show what the AI found, what it refused to decide, and why.”</p>
+  </div>
+
+  <div class="panel">
+    <h3>What it found (5)</h3>
+    <div>
+      <div class="item"><span class="sev warn">WARNING</span><div><p>For a referenced generic type with an unkeyed member, the <code>MsgPack004</code> build error is gone, and the formatter that now ships loses that member's value.</p>
+        <div class="ev"><span><b>ref-class-unkeyed ② Diagnostics</b>: before <code>MsgPack004 ×2, build fails</code> → after <code>none, build passes</code></span><span><b>ref-class-unkeyed ④ Run time, generated code</b>, after: <code>out Name=a; Unkeyed=0 ⚠️ value changed</code></span><span><b>ref-class-unkeyed ③ C# files</b>: <code>3 files</code> on both sides</span></div></div></div>
+      <div class="item"><span class="sev imp">IMPORTANT</span><div><p>The crash fix does not need the new filter: the PR built without the filter line still generates code for the issue's repro and still reports <code>MsgPack004</code>.</p>
+        <div class="ev"><span><b>issue-repro ③ C# files</b>, without line 239: <code>3 files</code></span><span><b>issue-repro ① Model</b>, without line 239: <code>Cmd: Scope, Member; Item&lt;T&gt;: Key</code></span><span><b>ref-class-unkeyed ② Diagnostics</b>, without line 239: <code>MsgPack004 ×2, build fails</code></span></div></div></div>
+      <div class="item"><span class="sev imp">IMPORTANT</span><div><p>The crash is fixed: the issue's repro used to throw in the type collector and now gets a model and generated code.</p>
+        <div class="ev"><span><b>issue-repro ① Model</b>: before <code>throws IndexOutOfRangeException</code> → after <code>Cmd: Scope, Member; Item&lt;T&gt;: Key</code></span><span><b>issue-repro ③ C# files</b>: before <code>0 files</code> → after <code>3 files</code></span></div></div></div>
+      <div class="item"><span class="sev imp">IMPORTANT</span><div><p>Only one of the two null-safe lookups is the crash fix: without line 1077 the issue's repro throws again, while without line 985 every input gives the same result, so no input here shows what the second lookup changes.</p>
+        <div class="ev"><span><b>issue-repro ① Model</b>, without line 1077: <code>throws IndexOutOfRangeException</code></span><span><b>issue-repro ① Model</b>, without line 985: <code>Cmd: Scope, Member; Item&lt;T&gt;: Key</code></span><span><b>ref-struct-unkeyed ① Model</b>, without line 1077: <code>throws IndexOutOfRangeException</code></span></div></div></div>
+      <div class="item"><span class="sev note">NOTE</span><div><p>The issue repro's wire format and the diagnostics for your own types are identical before and after.</p>
+        <div class="ev"><span><b>issue-repro ④ Run time, default</b>: <code>out Scope=s; Member.Key=k (intact)</code> on both sides</span><span><b>source-unkeyed-control ② Diagnostics</b>: <code>MsgPack004 ×3, build fails</code> on both sides</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>One input, step by step: the warning above</h3>
+    <p class="muted">A referenced generic class with an unkeyed member, followed through the pipeline. Only hand-off ② differs; it is where the difference starts.</p>
+    <div class="trace">
+      <div class="hop"><span class="hn">Input</span><span class="hv">Name=a; Unkeyed=7</span></div>
+      <div class="hop"><span class="hn">① Model</span><span class="hv">same both sides: Holder: Value; Bag&lt;T&gt;: Name</span></div>
+      <div class="hop cause"><span class="hn">② Diagnostics · cause</span><span class="hv">before: MsgPack004 ×2, build fails<br>after: none, build passes</span></div>
+      <div class="hop"><span class="hn">③ C# files</span><span class="hv">same: 3 files</span></div>
+      <div class="hop"><span class="hn">④ Generated code</span><span class="hv">same: out Name=a; Unkeyed=0 ⚠️</span></div>
+    </div>
+    <p>The same formatter that drops <code>Unkeyed</code> used to be blocked by a failing build. After the PR it ships.</p>
+  </div>
+
+  <div class="panel">
+    <h3>What it refused to decide (3)</h3>
+    <div>
+      <div class="item"><span class="sev intent">intent</span><div><p><strong>Should problems found inside referenced types stop being reported?</strong></p>
+        <dl class="kv"><dt>Why not decided</dt><dd>The issue asks only for no crash and a generated resolver. Silencing <code>MsgPack004</code> for referenced types is a reporting-policy change the requirement doesn't mention, and the author's third test asserts the silence as expected.</dd>
+        <dt>Would settle it</dt><dd>A maintainer's statement of the reporting policy for types from packages the user does not build.</dd>
+        <dt>Options</dt><dd>Keep the silence · keep only the crash fix and drop the filter · report it as a warning on the member that uses the type</dd>
+        <dt>Owner</dt><dd>Unassigned</dd></dl></div></div>
+      <div class="item"><span class="sev oor">out-of-reach</span><div><p><strong>Does the generated formatter work in a trimmed or NativeAOT app, where the issue's harm actually occurs?</strong></p>
+        <dl class="kv"><dt>Why not decided</dt><dd>The probe runs the generated code on .NET 8 with the JIT. No NativeAOT publish was built.</dd>
+        <dt>Would settle it</dt><dd>A NativeAOT publish of the issue's repro that round-trips an object through the generated resolver.</dd>
+        <dt>Owner</dt><dd>Unassigned</dd></dl></div></div>
+      <div class="item"><span class="sev oor">out-of-reach</span><div><p><strong>In an IDE with project references, are diagnostics for a referenced project's types now dropped too?</strong></p>
+        <dl class="kv"><dt>Why not decided</dt><dd>The filter forwards a diagnostic only if its location is in the compilation being analyzed. Nothing here runs a multi-project workspace.</dd>
+        <dt>Would settle it</dt><dd>A two-project Roslyn workspace test, or a check in Visual Studio.</dd>
+        <dt>Owner</dt><dd>Unassigned</dd></dl></div></div>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <div class="vt"><strong>Trust: high for the evidence, medium for the wording</strong><span class="badge b-computed">Values</span><span class="badge b-gated">Statements</span><span class="badge b-stated">Explanations</span></div>
+    <p>Every value under every item was copied by the script from a recording; all pointers resolved, nothing was moved to “not backed” and nothing was downgraded. The sentences themselves, such as “the formatter that now ships loses that member's value”, are the reviewer's words and are only as good as the quoted lines beside them. The three decisions name no owner yet, because the repository variable that assigns owners has not been set.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 5 -->
+<section id="c5" aria-labelledby="c5h">
+  <div class="sec-head">
+    <span class="eyebrow">Ask 5</span>
+    <h2 id="c5h">How the evidence lets a named human accept without a full read</h2>
+    <p class="challenge">“Show how the evidence lets a named human accept the change without a full read.”</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="n">4 / 4</span><span class="l">requirements met, each backed by a run or a test</span></div>
+    <div class="stat"><span class="n">3 / 3</span><span class="l">new tests fail on the old code and pass on the new</span></div>
+    <div class="stat"><span class="n">10 / 10</span><span class="l">executable changed lines ran under a test or input</span></div>
+    <div class="stat"><span class="n">4 / 4</span><span class="l">inputs showed the known break, so “no difference” counts</span></div>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Req.</th><th>Requirement</th><th>Covered by (hand-offs that differ)</th><th>Verdict</th></tr></thead>
+      <tbody class="tabnum">
+        <tr><td class="nowrap">R1 ★</td><td>The generator no longer crashes with <code>IndexOutOfRangeException</code> on a closed generic struct from a referenced assembly.</td><td><code>issue-repro</code> ① ② ③ ④<br><code>ref-struct-unkeyed</code> ① ② ③ ④</td><td>met</td></tr>
+        <tr><td>R2</td><td>The analyzer no longer crashes (<code>AD0001</code>) on the same input.</td><td><code>issue-repro</code> ① ② ③ ④<br><code>ref-struct-unkeyed</code> ① ② ③ ④</td><td>met</td></tr>
+        <tr><td>R3</td><td>A generated resolver and formatters are produced for such types.</td><td><code>issue-repro</code> ① ② ③ ④</td><td>met</td></tr>
+        <tr><td>R4</td><td>Diagnostics for types declared in the project itself are unchanged.</td><td><code>source-unkeyed-control</code>: no difference</td><td>met</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="stack">
+    <h3>Which part of the change causes what</h3>
+    <p class="muted">The PR rebuilt with one part removed at a time, every input run through each build (5 builds). “Needed” means removing the part brings the old value back.</p>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Part removed</th><th>Needed for</th><th>Not needed for</th><th>What it means</th></tr></thead>
+      <tbody>
+        <tr><td class="nowrap"><code>TypeCollector.cs</code> 239<br><span class="muted">the filter</span></td><td><code>ref-class-unkeyed</code> ②<br><span class="muted">partly: <code>ref-struct-unkeyed</code> ②</span></td><td><code>issue-repro</code> ① ② ③ ④<br><code>ref-struct-unkeyed</code> ① ③ ④</td><td>Silences <code>MsgPack004</code>. Has nothing to do with the crash.</td></tr>
+        <tr><td class="nowrap"><code>TypeCollector.cs</code> 985</td><td><strong>nothing</strong></td><td>every changed hand-off</td><td>No input shows what it changes. Its build's recording is byte-for-byte the PR's own.</td></tr>
+        <tr><td class="nowrap"><code>TypeCollector.cs</code> 1077</td><td><code>issue-repro</code> ① ② ③ ④<br><code>ref-struct-unkeyed</code> ① ③ ④</td><td><code>ref-class-unkeyed</code> ②</td><td>This line is the crash fix.</td></tr>
+        <tr><td class="nowrap">239 + 985 + 1429–1451<br><span class="muted">grouped by the compiler</span></td><td><code>ref-class-unkeyed</code> ②</td><td><code>issue-repro</code> ① ② ③ ④</td><td>The new helper and method can't be removed alone; the compiler named the lines that use them.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>The bug was reproduced, then gone.</strong> On the old code the issue's repro shows <code>throws IndexOutOfRangeException</code> at ① Model; on the new code it returns a model. Only then does the script allow R1 to be “met”.</p>
+  <div class="panel">
+    <h3>What the owner actually reads</h3>
+    <ul class="clean">
+      <li>The three lists at the top of the comment, with the quoted evidence under each item.</li>
+      <li>Decision 1 (reporting policy). It is the real question in this PR and needs a person, not more evidence.</li>
+      <li>Two pieces of code, chosen by the builds above: the filter (line 239, with its method at 1444–1450), which causes the policy change, and line 985, which no input explains. Line 1077 needs no read: removing it brings the crash back, so its job is proven.</li>
+      <li>Optionally, any finding re-run in about a minute with its <code>replay</code> command; the fingerprints in the footer show the evidence wasn't changed.</li>
+    </ul>
+  </div>
+  <div class="verdict">
+    <div class="vt"><strong>Trust: high where it ran, explicit where it didn't</strong><span class="badge b-computed">Numbers and causes computed</span></div>
+    <p>The four numbers and the cause table come from test results, coverage and extra builds, not from the reviewer. The reading list now follows from that table: read what a build shows is risky or unexplained, skip what a build proves. Three limits remain and are stated in the comment: no NativeAOT or IDE run, line coverage rather than branch coverage (the filter's “another project” branch never ran), and 7 other test projects not run.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 6 -->
+<section id="c6" aria-labelledby="c6h">
+  <div class="sec-head">
+    <span class="eyebrow">Ask 6</span>
+    <h2 id="c6h">Failure modes seen, and the decision log</h2>
+    <p class="challenge">“Name the failure modes you saw, and keep a short log of decisions.”</p>
+  </div>
+  <div class="cols">
+    <div class="panel">
+      <h3>In the agent-written change (PR 1)</h3>
+      <ul class="clean">
+        <li><strong>Scope creep.</strong> A reporting-policy change rode along with a 2-line crash fix; the what-if run shows they are separable.</li>
+        <li><strong>A test that locks in a side effect.</strong> The third new test asserts the silenced error as the expected result.</li>
+        <li><strong>New behaviour documented as old.</strong> <code>MsgPack004.md</code> describes “only reports on members declared in the project” as if it had always been so.</li>
+        <li><strong>A half-true justification.</strong> The code comment says reporting a location-less diagnostic is not permitted; before the PR it was reported and accepted.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>In the AI reviewer itself</h3>
+      <ul class="clean">
+        <li><strong>Claimed evidence that wasn't there.</strong> An early gate accepted any pointer containing “170 tests passed”. Replaced by resolved pointers.</li>
+        <li><strong>Gaming the symptom.</strong> On PR 2 the agent predicted the crash the PR fixes as “the bug”. Partly closed: “fixed” now also needs the symptom gone after.</li>
+        <li><strong>Environment drift.</strong> PR 1 ran on SDK 9 against a pinned 8; a later bug read the SDK version outside the repo and raised a false alarm.</li>
+        <li><strong>A stale reviewer.</strong> CI once used an old copy of the reviewer from the PR's recorded base commit; now it takes the base branch tip.</li>
+        <li><strong>An overstated write-up.</strong> Our own hand-written analysis of PR 1 called both lookups “the crash fix”. The per-line builds showed only line 1077 is; line 985 changes nothing any input shows.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>What review-map missed on PR 1</h3>
+    <p>A second team's reviewer, run on the same branch, reported three things review-map did not. They are listed as reported, not yet confirmed by a run here.</p>
+    <ul class="clean">
+      <li>A positional record with <code>[property: Key(null)]</code> may silently lose its <code>MsgPack005</code> error under the new filter.</li>
+      <li>The filter drops every location-less diagnostic, not only <code>MsgPack004</code>, for example a missing deserializing constructor.</li>
+      <li>The base branch carries a Roslyn version bump inside a commit titled “Bump PolySharp”, which a reviewer could mistake for part of the change.</li>
+    </ul>
+    <p class="muted">The first two are exactly what new probe inputs can settle; adding them is the next step.</p>
+  </div>
+  <details open>
+    <summary>Decision log (all on 2026-11-14)</summary>
+    <div class="tbl">
+      <table class="log">
+        <thead><tr><th>#</th><th>Decision</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>D1</td><td>Run each input before and after, instead of only reading the diff.</td><td>Input and output per unit, with cause and effect, is what a human needs to trust a change.</td></tr>
+          <tr><td>D2</td><td>“Before” reverts only the PR's source files and keeps its tests.</td><td>So the PR's own tests are judged against the old code.</td></tr>
+          <tr><td>D3</td><td>Deliver the review as one comment on the PR.</td><td>Reviewers already work there; nothing to install.</td></tr>
+          <tr><td>D4</td><td>Cause and effect tags follow the pipeline graph, not the order of hand-offs.</td><td>Parallel branches can each have their own cause; PR 1's third input needed it.</td></tr>
+          <tr><td>D5</td><td>Three CI jobs; PR code never runs where the API key is; the reviewer comes from the base branch.</td><td>A pull request must not be able to steal secrets or change its own reviewer.</td></tr>
+          <tr><td>D6</td><td>Default to Sonnet 5.5 in CI.</td><td>About $0.20–0.30 per review; Opus can be set per repository.</td></tr>
+          <tr><td>D7</td><td>The agent writes pointers, never values; a script resolves and quotes them.</td><td>Closes the main hallucination path: invented numbers.</td></tr>
+          <tr><td>D8</td><td>Script-only checks: non-discriminating tests, changed-line coverage, a known-break run, reduced confidence, fingerprints.</td><td>Facts the agent should not be the source of.</td></tr>
+          <tr><td>D9</td><td>Split the top into found, refused to decide, not checked; four fixed refusal reasons.</td><td>Mixed alerts hid which items were facts and which were questions.</td></tr>
+          <tr><td>D10</td><td>Requirements and the expected symptom are chosen before anything runs; the script refuses “fixed” if the symptom wasn't reproduced.</td><td>Makes “refused to decide” a rule a judge can read.</td></tr>
+          <tr><td>D11</td><td>Fixed lists checked by the script; the analysis call split into two.</td><td>One schema with every section was too large for the API's structured outputs.</td></tr>
+          <tr><td>D12</td><td>Decision owners only from people a human named; never link upstream issues.</td><td>Decisions belong to an engineer, not to the PR's author, which is an agent.</td></tr>
+          <tr><td>D13</td><td>PR 1's hand-written analysis goes through the same gate, and says its requirements are not a prediction.</td><td>Same rules for every review, and no overstated claim.</td></tr>
+          <tr><td>D14</td><td>Rebuild the PR with each changed part removed; group parts by the compiler's errors; a part whose removal changes nothing becomes a not-checked item.</td><td>Turns “the reviewer thinks this line causes it” into a computed cause. Replaced the one-off manual what-if, whose recording it matches byte for byte.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+  <div class="verdict mid">
+    <div class="vt"><strong>Trust: medium</strong><span class="badge b-stated">Mostly written</span></div>
+    <p>A log and a list of failure modes are written by nature. Each item points at something that happened in this project's runs or code, and the misses are listed rather than hidden, but none of this section is computed.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Evidence for PR 1, SHA-256: scenarios.json <span class="mono">2c5fd332dc7799c9</span> · probe-before.json <span class="mono">eea6b7aef0a661b4</span> · probe-after.json <span class="mono">ebc946df2ab7fcc2</span> · probe-mutant.json <span class="mono">8c3f77ca4b589df1</span> · tests.json <span class="mono">1332e7041af4dfef</span> · probe-without-H1.json <span class="mono">ff55fc3802ba30c1</span> · probe-without-H2.json <span class="mono">ebc946df2ab7fcc2</span> · probe-without-H3.json <span class="mono">a62000c469a2674f</span> · probe-without-H1+H2+H4.json <span class="mono">ff55fc3802ba30c1</span></p>
+  <p>Built from <span class="mono">review-map/analyses/2283.json</span>. Upstream issues are written as text and never linked.</p>
+</footer>
+
+</div>

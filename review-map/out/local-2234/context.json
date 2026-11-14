@@ -1,0 +1,21 @@
+{
+  "slug": "ZeynelAbidin91/junction26-messagepack-csharp",
+  "pr": {
+    "number": 2,
+    "title": "Implementation for #2234 The analyzer does not work if SuppressSourceGeneration = true",
+    "body": "Agent-written change from the Junction 2026 challenge branch `ju26-issue-2234` (commit `9007cee1`), opened inside this fork to test the automatic review map. It is not proposed to the upstream project.\n\nThe review map is posted below by the `Review map` workflow: a reviewing agent that did not write this change picks real inputs, runs them and the tests before and after the change, and explains the evidence.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)",
+    "headRef": "ju26-issue-2234",
+    "headSha": "9007cee1163c4a274fd60c3cc20c21ae63622786",
+    "baseSha": "59d3442ed8538c5bba0234aa610c3e067a632cb9",
+    "url": "https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/pull/2"
+  },
+  "head": "9007cee1163c4a274fd60c3cc20c21ae63622786",
+  "mergeBase": "32258fdbee4bcd653c79f51b4376b5103c6f4d27",
+  "commitMessage": "Implementation for #2234 The analyzer does not work if SuppressSourceGeneration = true",
+  "issue": {
+    "ref": "MessagePack-CSharp#2234",
+    "title": "The analyzer does not work if SuppressSourceGeneration = true",
+    "body": "#### Bug description\n\nThe analyzer does not work if SuppressSourceGeneration = true. This has happened since version 3.1.1. It still worked in 3.1.0.\n\n"
+  },
+  "adapter": "messagepack"
+}

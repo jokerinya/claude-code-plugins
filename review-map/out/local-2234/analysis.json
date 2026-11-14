@@ -1,0 +1,1565 @@
+{
+  "pr": {
+    "branch": "ju26-issue-2234",
+    "head": "9007cee1",
+    "base": "32258fdb",
+    "blob": "https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9007cee1163c4a274fd60c3cc20c21ae63622786",
+    "issueRef": "MessagePack-CSharp#2234",
+    "noLinkRepos": [
+      "MessagePack-CSharp/MessagePack-CSharp"
+    ],
+    "generatedBy": "Generated automatically by review-map with `fixture (hand-written agent output with planted mistakes)`, which did not write this change."
+  },
+  "confidence": [
+    "Built with .NET SDK 9.0.301, but the repo pins 8.0.402 (rollForward patch); the pin was overridden for this run. Compiler and analyzer behaviour can differ between SDKs."
+  ],
+  "found": [
+    {
+      "severity": "WARNING",
+      "statement": "4 of 8 new tests also pass on the old code, so they do not test this change: `AllowPrivateRequiredIsReported`, `MemberTypeMustBeMessagePackObjectIsReported`, `MemberWithoutKeyIsReported`, `SourceGenerationOnlyDiagnosticsAreNotReportedWhenSuppressed`.",
+      "computed": true
+    },
+    {
+      "statement": "A duplicate key now compiles into a formatter that drops data",
+      "severity": "WARNING",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "generated-dup-string-keys-fields",
+          "handoff": "generated",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-generated-dup-string-keys-fields",
+            "quote": "`generated-dup-string-keys-fields` ③ C# files: before `0 files` → after `2 files`",
+            "data": {
+              "kind": "run",
+              "scenario": "generated-dup-string-keys-fields",
+              "node": "③ C# files",
+              "side": "both",
+              "differs": true,
+              "before": "0 files",
+              "after": "2 files"
+            },
+            "short": "[`generated-dup-string-keys-fields` ③](#user-content-trace-generated-dup-string-keys-fields)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "generated-dup-string-keys-fields",
+          "handoff": "rtGenerated",
+          "side": "after",
+          "expects": "any",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-generated-dup-string-keys-fields",
+            "quote": "`generated-dup-string-keys-fields` ④ Run time, generated code, after: `out F1=left; F2=0 ⚠️ value changed`",
+            "data": {
+              "kind": "run",
+              "scenario": "generated-dup-string-keys-fields",
+              "node": "④ Run time, generated code",
+              "side": "after",
+              "value": "out F1=left; F2=0 ⚠️ value changed"
+            },
+            "short": "[`generated-dup-string-keys-fields` ④ after](#user-content-trace-generated-dup-string-keys-fields)"
+          }
+        }
+      ]
+    },
+    {
+      "statement": "Code-only warning: the guard skips a colliding member.",
+      "severity": "NOTE",
+      "refs": [
+        {
+          "kind": "code",
+          "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "startLine": 1023,
+          "endLine": 1026,
+          "resolved": {
+            "ok": true,
+            "quote": "[TypeCollector.cs lines 1023–1026](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9007cee1163c4a274fd60c3cc20c21ae63622786/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1023-L1026): `if (!intMembers.ContainsKey(member.IntKey))`",
+            "data": {
+              "kind": "code",
+              "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+              "where": "TypeCollector.cs lines 1023–1026",
+              "url": "https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9007cee1163c4a274fd60c3cc20c21ae63622786/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1023-L1026",
+              "start": 1023,
+              "lines": [
+                "                        if (!intMembers.ContainsKey(member.IntKey))",
+                "                        {",
+                "                            intMembers.Add(member.IntKey, (member, item.Type));",
+                "                        }"
+              ]
+            },
+            "short": "[TypeCollector.cs lines 1023–1026](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9007cee1163c4a274fd60c3cc20c21ae63622786/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1023-L1026)"
+          }
+        }
+      ]
+    },
+    {
+      "statement": "Valid types are unaffected. The control input behaves the same on both sides.",
+      "severity": "NOTE",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "suppressed-valid-control",
+          "handoff": "rtDefault",
+          "side": "both",
+          "expects": "same",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-suppressed-valid-control",
+            "quote": "`suppressed-valid-control` ④ Run time, default: `out Id=41; Name=forty-one (intact)` on both sides",
+            "data": {
+              "kind": "run",
+              "scenario": "suppressed-valid-control",
+              "node": "④ Run time, default",
+              "side": "both",
+              "differs": false,
+              "before": "out Id=41; Name=forty-one (intact)",
+              "after": "out Id=41; Name=forty-one (intact)"
+            },
+            "short": "[`suppressed-valid-control` ④](#user-content-trace-suppressed-valid-control)"
+          }
+        }
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "question": "Is \"first member wins\" acceptable for duplicate keys?",
+      "reason": "trade-off",
+      "detail": "The generator now emits a formatter that keeps the first member; MsgPack005 still fails the build.",
+      "wouldSettleIt": "A maintainer decision on generator behaviour for invalid types.",
+      "options": [
+        "Keep it while MsgPack005 stays an error",
+        "Skip invalid types in the generator"
+      ],
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "generated-dup-string-keys-fields",
+          "handoff": "rtGenerated",
+          "side": "after",
+          "expects": "any",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-generated-dup-string-keys-fields",
+            "quote": "`generated-dup-string-keys-fields` ④ Run time, generated code, after: `out F1=left; F2=0 ⚠️ value changed`",
+            "data": {
+              "kind": "run",
+              "scenario": "generated-dup-string-keys-fields",
+              "node": "④ Run time, generated code",
+              "side": "after",
+              "value": "out F1=left; F2=0 ⚠️ value changed"
+            },
+            "short": "[`generated-dup-string-keys-fields` ④ after](#user-content-trace-generated-dup-string-keys-fields)"
+          }
+        }
+      ],
+      "owner": {
+        "login": null,
+        "source": "unassigned"
+      }
+    }
+  ],
+  "notChecked": [
+    {
+      "item": "What [TypeCollector.cs 1039–1042](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9007cee1163c4a274fd60c3cc20c21ae63622786/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1039-L1042) does",
+      "reason": "removing it from the PR changes nothing in any input that ran, so no input shows what it does (the lines may still run, with the same result either way)",
+      "riskIfWrong": "whatever this part changes is not shown anywhere in this review",
+      "howToCheck": "add an input whose result differs with and without these lines, or a test that fails without them",
+      "computed": true
+    },
+    {
+      "item": "What [TypeCollector.cs 1163–1166](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9007cee1163c4a274fd60c3cc20c21ae63622786/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1163-L1166) does",
+      "reason": "removing it from the PR changes nothing in any input that ran, so no input shows what it does (the lines may still run, with the same result either way)",
+      "riskIfWrong": "whatever this part changes is not shown anywhere in this review",
+      "howToCheck": "add an input whose result differs with and without these lines, or a test that fails without them",
+      "computed": true
+    },
+    {
+      "item": "7 other test projects: `MessagePack.AspNetCoreMvcFormatter.Tests`, `MessagePack.Experimental.Tests`, `MessagePack.GeneratedCode.Tests`, `MessagePack.Internal.Tests`, `MessagePack.SourceGenerator.ExecutionTests` (changed by this PR), `MessagePack.SourceGenerator.MapModeExecutionTests`, `MessagePack.Tests`",
+      "reason": "only `MessagePack.SourceGenerator.Tests.csproj` was run",
+      "riskIfWrong": "this PR changes files in some of them, so their results matter",
+      "howToCheck": "dotnet test tests/MessagePack.SourceGenerator.ExecutionTests/MessagePack.SourceGenerator.ExecutionTests.csproj",
+      "computed": true
+    },
+    {
+      "item": "Map-mode execution",
+      "reason": "no scenario uses map mode at run time",
+      "riskIfWrong": "string-keyed types behave differently",
+      "howToCheck": "run MessagePack.SourceGenerator.MapModeExecutionTests"
+    }
+  ],
+  "requirements": [],
+  "reproduction": {
+    "status": "no-symptom",
+    "symptom": {
+      "contains": []
+    },
+    "rows": []
+  },
+  "plannedBeforeRuns": true,
+  "summary": [
+    {
+      "sentence": "Duplicate or mixed keys no longer crash the type collector; it now keeps one member.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "generated-dup-string-keys-fields",
+          "handoff": "model",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-generated-dup-string-keys-fields",
+            "quote": "`generated-dup-string-keys-fields` ① Model: before `throws ArgumentException` → after `DupFields: F1`",
+            "data": {
+              "kind": "run",
+              "scenario": "generated-dup-string-keys-fields",
+              "node": "① Model",
+              "side": "both",
+              "differs": true,
+              "before": "throws ArgumentException",
+              "after": "DupFields: F1"
+            },
+            "short": "[`generated-dup-string-keys-fields` ①](#user-content-trace-generated-dup-string-keys-fields)"
+          }
+        }
+      ]
+    },
+    {
+      "sentence": "The kept formatter silently loses the second member's value.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "generated-dup-string-keys-fields",
+          "handoff": "rtGenerated",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-generated-dup-string-keys-fields",
+            "quote": "`generated-dup-string-keys-fields` ④ Run time, generated code: before `no generated resolver` → after `out F1=left; F2=0 ⚠️ value changed`",
+            "data": {
+              "kind": "run",
+              "scenario": "generated-dup-string-keys-fields",
+              "node": "④ Run time, generated code",
+              "side": "both",
+              "differs": true,
+              "before": "no generated resolver",
+              "after": "out F1=left; F2=0 ⚠️ value changed"
+            },
+            "short": "[`generated-dup-string-keys-fields` ④](#user-content-trace-generated-dup-string-keys-fields)"
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "TC",
+      "label": "TypeCollector",
+      "sub": "builds the model",
+      "status": "changed"
+    },
+    {
+      "id": "GEN",
+      "label": "Templates",
+      "sub": "emit formatters",
+      "status": "affected"
+    },
+    {
+      "id": "RT",
+      "label": "Run time",
+      "sub": "serialize",
+      "status": "affected"
+    }
+  ],
+  "edges": [
+    {
+      "from": "TC",
+      "to": "GEN",
+      "label": "① model",
+      "changed": true
+    },
+    {
+      "from": "GEN",
+      "to": "RT",
+      "label": "③ C# files",
+      "changed": true
+    }
+  ],
+  "traces": {
+    "evidence": "evidence",
+    "adapter": "messagepack",
+    "cases": [
+      {
+        "id": "generated-dup-string-keys-fields",
+        "title": "Two fields share a string key",
+        "story": "① the model keeps F1 only, so ③ emits a formatter for one member and ④ reads F2 back as 0.",
+        "where": {}
+      },
+      {
+        "id": "suppressed-valid-control",
+        "title": "Control: valid suppressed type with int keys should be unaffected and use the dynamic resolver",
+        "story": "Shows that a valid suppressed type yields the same model, no diagnostics and the same dynamic round-trip before and after, with no generated formatter.",
+        "where": {}
+      },
+      {
+        "id": "mixed-keys-props-int-first",
+        "title": "Properties with an int key followed by a string key (mixed kinds, MsgPack005)",
+        "story": "Shows the new `continue` on mixed key kinds, so the model and generated code drop B after the change while the diagnostic is still reported.",
+        "where": {}
+      }
+    ]
+  },
+  "tests": {
+    "project": "tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj",
+    "after": {
+      "built": true,
+      "total": 175,
+      "passed": 175,
+      "failed": 0,
+      "skipped": 0
+    },
+    "before": {
+      "built": true,
+      "total": 175,
+      "passed": 171,
+      "failed": 4,
+      "skipped": 0,
+      "mode": "source files reverted, the PR's tests kept",
+      "modeId": "tests-kept"
+    },
+    "changes": [
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.DuplicateIntKeysAreReportedWithoutAnalyzerFailure",
+        "before": "Failed",
+        "after": "Passed"
+      },
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.DuplicateKeysAreReportedWithoutAnalyzerFailureForGeneratedTypes",
+        "before": "Failed",
+        "after": "Passed"
+      },
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.DuplicateStringKeysAreReportedWithoutAnalyzerFailure",
+        "before": "Failed",
+        "after": "Passed"
+      },
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.MixedKeyKindsAreReportedWithoutAnalyzerFailure",
+        "before": "Failed",
+        "after": "Passed"
+      }
+    ],
+    "newTests": [
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.DuplicateIntKeysAreReportedWithoutAnalyzerFailure",
+        "before": "Failed",
+        "after": "Passed",
+        "verdict": "discriminates"
+      },
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.DuplicateKeysAreReportedWithoutAnalyzerFailureForGeneratedTypes",
+        "before": "Failed",
+        "after": "Passed",
+        "verdict": "discriminates"
+      },
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.DuplicateStringKeysAreReportedWithoutAnalyzerFailure",
+        "before": "Failed",
+        "after": "Passed",
+        "verdict": "discriminates"
+      },
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.MixedKeyKindsAreReportedWithoutAnalyzerFailure",
+        "before": "Failed",
+        "after": "Passed",
+        "verdict": "discriminates"
+      },
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.AllowPrivateRequiredIsReported",
+        "before": "Passed",
+        "after": "Passed",
+        "verdict": "passes-both"
+      },
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.MemberTypeMustBeMessagePackObjectIsReported",
+        "before": "Passed",
+        "after": "Passed",
+        "verdict": "passes-both"
+      },
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.MemberWithoutKeyIsReported",
+        "before": "Passed",
+        "after": "Passed",
+        "verdict": "passes-both"
+      },
+      {
+        "name": "SuppressSourceGenerationAnalyzerTests.SourceGenerationOnlyDiagnosticsAreNotReportedWhenSuppressed",
+        "before": "Passed",
+        "after": "Passed",
+        "verdict": "passes-both"
+      }
+    ],
+    "modifiedTestFiles": [],
+    "probe": {
+      "after": "ok",
+      "before": "ok"
+    },
+    "coverage": {
+      "measured": true,
+      "executable": 18,
+      "reached": 18,
+      "byProbe": 10,
+      "byTests": 13,
+      "removedLines": 4,
+      "files": [
+        {
+          "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "inReport": true,
+          "changed": 18,
+          "executable": 18,
+          "byProbe": 10,
+          "byTests": 13,
+          "reached": 18,
+          "unreached": []
+        }
+      ]
+    },
+    "mutation": {
+      "applied": true,
+      "description": "TypeCollector drops the first member of every type it collects",
+      "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+      "probe": "ok"
+    },
+    "ablation": {
+      "ran": true,
+      "hunks": [
+        {
+          "id": "H1",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "label": "TypeCollector.cs 1008",
+          "newStart": 1008,
+          "newCount": 1,
+          "oldCount": 0,
+          "whole": null,
+          "added": [
+            "                            continue; // The key kind does not match the other members; the diagnostic is reported, so skip this member."
+          ]
+        },
+        {
+          "id": "H2",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "label": "TypeCollector.cs 1023–1026",
+          "newStart": 1023,
+          "newCount": 4,
+          "oldCount": 1,
+          "whole": null,
+          "added": [
+            "                        if (!intMembers.ContainsKey(member.IntKey))",
+            "                        {",
+            "                            intMembers.Add(member.IntKey, (member, item.Type));",
+            "                        }"
+          ]
+        },
+        {
+          "id": "H3",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "label": "TypeCollector.cs 1039–1042",
+          "newStart": 1039,
+          "newCount": 4,
+          "oldCount": 1,
+          "whole": null,
+          "added": [
+            "                        if (!stringMembers.ContainsKey(member.StringKey))",
+            "                        {",
+            "                            stringMembers.Add(member.StringKey, (member, item.Type));",
+            "                        }"
+          ]
+        },
+        {
+          "id": "H4",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "label": "TypeCollector.cs 1148",
+          "newStart": 1148,
+          "newCount": 1,
+          "oldCount": 0,
+          "whole": null,
+          "added": [
+            "                            continue; // The key kind does not match the other members; the diagnostic is reported, so skip this member."
+          ]
+        },
+        {
+          "id": "H5",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "label": "TypeCollector.cs 1163–1166",
+          "newStart": 1163,
+          "newCount": 4,
+          "oldCount": 1,
+          "whole": null,
+          "added": [
+            "                        if (!intMembers.ContainsKey(member.IntKey))",
+            "                        {",
+            "                            intMembers.Add(member.IntKey, (member, item.Type));",
+            "                        }"
+          ]
+        },
+        {
+          "id": "H6",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "label": "TypeCollector.cs 1179–1182",
+          "newStart": 1179,
+          "newCount": 4,
+          "oldCount": 1,
+          "whole": null,
+          "added": [
+            "                        if (!stringMembers.ContainsKey(member.StringKey))",
+            "                        {",
+            "                            stringMembers.Add(member.StringKey, (member, item.Type));",
+            "                        }"
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "id": "H1",
+          "hunks": [
+            "H1"
+          ],
+          "build": "ok",
+          "probe": "ok"
+        },
+        {
+          "id": "H2",
+          "hunks": [
+            "H2"
+          ],
+          "build": "ok",
+          "probe": "ok"
+        },
+        {
+          "id": "H3",
+          "hunks": [
+            "H3"
+          ],
+          "build": "ok",
+          "probe": "ok"
+        },
+        {
+          "id": "H4",
+          "hunks": [
+            "H4"
+          ],
+          "build": "ok",
+          "probe": "ok"
+        },
+        {
+          "id": "H5",
+          "hunks": [
+            "H5"
+          ],
+          "build": "ok",
+          "probe": "ok"
+        },
+        {
+          "id": "H6",
+          "hunks": [
+            "H6"
+          ],
+          "build": "ok",
+          "probe": "ok"
+        }
+      ],
+      "runs": 6
+    },
+    "sdk": "9.0.301",
+    "pinnedSdk": {
+      "version": "8.0.402",
+      "rollForward": "patch",
+      "allowPrerelease": false
+    },
+    "rollForwardSdk": true,
+    "changedFiles": [
+      {
+        "status": "M",
+        "path": "README.md"
+      },
+      {
+        "status": "M",
+        "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs"
+      },
+      {
+        "status": "A",
+        "path": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs"
+      },
+      {
+        "status": "A",
+        "path": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs"
+      }
+    ],
+    "runner": "win32"
+  },
+  "units": [
+    {
+      "name": "TypeCollector member collection",
+      "status": "changed",
+      "where": null,
+      "receives": "a type symbol",
+      "emits": "the model",
+      "change": "skips a member whose key is taken",
+      "examples": [
+        {
+          "note": "Mixed keys: the collector used to throw, now keeps A.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "mixed-keys-props-int-first",
+              "handoff": "model",
+              "side": "both",
+              "expects": "differs",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-mixed-keys-props-int-first",
+                "quote": "`mixed-keys-props-int-first` ① Model: before `throws InvalidOperationException` → after `Mixed: A`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "mixed-keys-props-int-first",
+                  "node": "① Model",
+                  "side": "both",
+                  "differs": true,
+                  "before": "throws InvalidOperationException",
+                  "after": "Mixed: A"
+                },
+                "short": "[`mixed-keys-props-int-first` ①](#user-content-trace-mixed-keys-props-int-first)"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claim": "Duplicate int keys are reported without an analyzer failure",
+      "source": "test name",
+      "verdict": "verified",
+      "evidence": "The new test fails on the old code and passes now.",
+      "refs": [
+        {
+          "kind": "test",
+          "test": "SuppressSourceGenerationAnalyzerTests.DuplicateIntKeysAreReportedWithoutAnalyzerFailure",
+          "expects": "fails-before-passes-after",
+          "resolved": {
+            "ok": true,
+            "quote": "test `SuppressSourceGenerationAnalyzerTests.DuplicateIntKeysAreReportedWithoutAnalyze…`: before Failed → after Passed",
+            "data": {
+              "kind": "test",
+              "name": "SuppressSourceGenerationAnalyzerTests.DuplicateIntKeysAreReportedWithoutAnalyzerFailure",
+              "before": "Failed",
+              "after": "Passed"
+            },
+            "short": "test `DuplicateIntKeysAreReportedWithoutAnalyzerFailure`"
+          }
+        }
+      ]
+    },
+    {
+      "claim": "A colliding member is skipped rather than added",
+      "source": "code comment",
+      "verdict": "code-only",
+      "evidence": "The guard is in the code.",
+      "refs": [
+        {
+          "kind": "code",
+          "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "startLine": 1023,
+          "endLine": 1026,
+          "resolved": {
+            "ok": true,
+            "quote": "[TypeCollector.cs lines 1023–1026](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9007cee1163c4a274fd60c3cc20c21ae63622786/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1023-L1026): `if (!intMembers.ContainsKey(member.IntKey))`",
+            "data": {
+              "kind": "code",
+              "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+              "where": "TypeCollector.cs lines 1023–1026",
+              "url": "https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9007cee1163c4a274fd60c3cc20c21ae63622786/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1023-L1026",
+              "start": 1023,
+              "lines": [
+                "                        if (!intMembers.ContainsKey(member.IntKey))",
+                "                        {",
+                "                            intMembers.Add(member.IntKey, (member, item.Type));",
+                "                        }"
+              ]
+            },
+            "short": "[TypeCollector.cs lines 1023–1026](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9007cee1163c4a274fd60c3cc20c21ae63622786/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1023-L1026)"
+          }
+        }
+      ]
+    },
+    {
+      "claim": "Fixes the issue's main symptom",
+      "source": "PR title",
+      "verdict": "not-verified",
+      "evidence": "No scenario reproduces the issue's report.",
+      "refs": []
+    }
+  ],
+  "unverified": [
+    {
+      "section": "Summary",
+      "text": "PLANTED: a sentence with no evidence at all.",
+      "reasons": [
+        "cites no evidence"
+      ],
+      "quotes": []
+    },
+    {
+      "section": "Found",
+      "text": "PLANTED: wrong direction. Claims the suppressed duplicate-int case now generates files.",
+      "reasons": [
+        "cited as a difference, but ③ C# files is identical before and after"
+      ],
+      "quotes": [
+        "`suppressed-dup-int-keys` ③ C# files: `0 files` on both sides"
+      ]
+    },
+    {
+      "section": "Unit TypeCollector member collection",
+      "text": "PLANTED: cites a scenario that never ran.",
+      "reasons": [
+        "scenario `no-such-scenario` did not run"
+      ],
+      "quotes": []
+    },
+    {
+      "section": "Claims",
+      "text": "\"PLANTED: all tests pass\" (verified)",
+      "reasons": [
+        "no test called `all 170 tests passed` ran"
+      ],
+      "quotes": []
+    },
+    {
+      "section": "Claims",
+      "text": "\"PLANTED: private required members are newly reported\" (verified)",
+      "reasons": [
+        "cited as fails-before-passes-after, but the recorded outcome is passes-both"
+      ],
+      "quotes": [
+        "test `SuppressSourceGenerationAnalyzerTests.AllowPrivateRequiredIsReported`: before Passed → after Passed"
+      ]
+    },
+    {
+      "section": "Claims",
+      "text": "\"PLANTED: malformed pointer\" (verified)",
+      "reasons": [
+        "malformed pointer `run:generated-dup-string-keys-fields:model`: expected run:<scenario>:<handoff>:<side>:<expects>"
+      ],
+      "quotes": []
+    }
+  ],
+  "sensitivity": {
+    "ran": true,
+    "description": "TypeCollector drops the first member of every type it collects",
+    "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+    "scenarios": 6,
+    "detected": 3,
+    "where": [
+      "① Model",
+      "③ C# files",
+      "④ Run time, default",
+      "④ Run time, generated code"
+    ],
+    "rows": [
+      {
+        "id": "suppressed-valid-control",
+        "handoffs": []
+      },
+      {
+        "id": "suppressed-unkeyed-member",
+        "handoffs": []
+      },
+      {
+        "id": "suppressed-dup-int-keys",
+        "handoffs": []
+      },
+      {
+        "id": "generated-dup-string-keys-fields",
+        "handoffs": [
+          "① Model",
+          "③ C# files",
+          "④ Run time, default",
+          "④ Run time, generated code"
+        ]
+      },
+      {
+        "id": "mixed-keys-props-int-first",
+        "handoffs": [
+          "① Model",
+          "③ C# files",
+          "④ Run time, default",
+          "④ Run time, generated code"
+        ]
+      },
+      {
+        "id": "mixed-keys-fields-string-first",
+        "handoffs": [
+          "① Model",
+          "③ C# files",
+          "④ Run time, default",
+          "④ Run time, generated code"
+        ]
+      }
+    ]
+  },
+  "effects": {
+    "ran": true,
+    "groups": [
+      {
+        "id": "H1",
+        "side": "without-H1",
+        "hunks": [
+          {
+            "id": "H1",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 1008",
+            "newStart": 1008,
+            "newCount": 1,
+            "oldCount": 0,
+            "whole": null,
+            "added": [
+              "                            continue; // The key kind does not match the other members; the diagnostic is reported, so skip this member."
+            ]
+          }
+        ],
+        "build": "ok",
+        "errors": [],
+        "needed": [
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "partly": [],
+        "notNeeded": [
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "sideEffects": []
+      },
+      {
+        "id": "H2",
+        "side": "without-H2",
+        "hunks": [
+          {
+            "id": "H2",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 1023–1026",
+            "newStart": 1023,
+            "newCount": 4,
+            "oldCount": 1,
+            "whole": null,
+            "added": [
+              "                        if (!intMembers.ContainsKey(member.IntKey))",
+              "                        {",
+              "                            intMembers.Add(member.IntKey, (member, item.Type));",
+              "                        }"
+            ]
+          }
+        ],
+        "build": "ok",
+        "errors": [],
+        "needed": [
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          }
+        ],
+        "partly": [],
+        "notNeeded": [
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "sideEffects": []
+      },
+      {
+        "id": "H3",
+        "side": "without-H3",
+        "hunks": [
+          {
+            "id": "H3",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 1039–1042",
+            "newStart": 1039,
+            "newCount": 4,
+            "oldCount": 1,
+            "whole": null,
+            "added": [
+              "                        if (!stringMembers.ContainsKey(member.StringKey))",
+              "                        {",
+              "                            stringMembers.Add(member.StringKey, (member, item.Type));",
+              "                        }"
+            ]
+          }
+        ],
+        "build": "ok",
+        "errors": [],
+        "needed": [],
+        "partly": [],
+        "notNeeded": [
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "sideEffects": []
+      },
+      {
+        "id": "H4",
+        "side": "without-H4",
+        "hunks": [
+          {
+            "id": "H4",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 1148",
+            "newStart": 1148,
+            "newCount": 1,
+            "oldCount": 0,
+            "whole": null,
+            "added": [
+              "                            continue; // The key kind does not match the other members; the diagnostic is reported, so skip this member."
+            ]
+          }
+        ],
+        "build": "ok",
+        "errors": [],
+        "needed": [
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "partly": [],
+        "notNeeded": [
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "sideEffects": []
+      },
+      {
+        "id": "H5",
+        "side": "without-H5",
+        "hunks": [
+          {
+            "id": "H5",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 1163–1166",
+            "newStart": 1163,
+            "newCount": 4,
+            "oldCount": 1,
+            "whole": null,
+            "added": [
+              "                        if (!intMembers.ContainsKey(member.IntKey))",
+              "                        {",
+              "                            intMembers.Add(member.IntKey, (member, item.Type));",
+              "                        }"
+            ]
+          }
+        ],
+        "build": "ok",
+        "errors": [],
+        "needed": [],
+        "partly": [],
+        "notNeeded": [
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "sideEffects": []
+      },
+      {
+        "id": "H6",
+        "side": "without-H6",
+        "hunks": [
+          {
+            "id": "H6",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 1179–1182",
+            "newStart": 1179,
+            "newCount": 4,
+            "oldCount": 1,
+            "whole": null,
+            "added": [
+              "                        if (!stringMembers.ContainsKey(member.StringKey))",
+              "                        {",
+              "                            stringMembers.Add(member.StringKey, (member, item.Type));",
+              "                        }"
+            ]
+          }
+        ],
+        "build": "ok",
+        "errors": [],
+        "needed": [
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "generated-dup-string-keys-fields",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "partly": [],
+        "notNeeded": [
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "suppressed-dup-int-keys",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-props-int-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtDefault",
+            "node": "④ Run time, default"
+          },
+          {
+            "scenario": "mixed-keys-fields-string-first",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "sideEffects": []
+      }
+    ],
+    "runs": 6
+  },
+  "integrity": {
+    "files": [
+      {
+        "name": "scenarios.json",
+        "sha256": "c2fbcab67f23f15444c8f008ea13b6372e7f6ba9952fc2192408a2b7e473b237"
+      },
+      {
+        "name": "probe-before.json",
+        "sha256": "97a011b1176250cf8dae297711c7333fb7efb323bd0ce8cc44bed399a843eef0"
+      },
+      {
+        "name": "probe-after.json",
+        "sha256": "d2772dae854d2e00db45aa787492bf43f5ed9c18eb712e0298c14405657448e0"
+      },
+      {
+        "name": "probe-mutant.json",
+        "sha256": "7b97588f063504ead57a043600164951a3d707a573216c161a3be8aa91f7311a"
+      },
+      {
+        "name": "tests.json",
+        "sha256": "1e0a06c2bff999d7164a9ef58b85e2bb51740dabcce71e8051ea3b3a2f82c0ef"
+      },
+      {
+        "name": "probe-without-H1.json",
+        "sha256": "6b01167d372b204917f2b7ccef6b512b95a4e582b652b8bf2978fc7f189433c6"
+      },
+      {
+        "name": "probe-without-H2.json",
+        "sha256": "3c78265577dfa785a658efa427807d54f404f272b3dd4967077fc47d230b8ac5"
+      },
+      {
+        "name": "probe-without-H3.json",
+        "sha256": "d2772dae854d2e00db45aa787492bf43f5ed9c18eb712e0298c14405657448e0"
+      },
+      {
+        "name": "probe-without-H4.json",
+        "sha256": "c9eab84efd7c9a6038228d655f5cd2c6e392cfac89a06b2a3e0aa8d67453ca8a"
+      },
+      {
+        "name": "probe-without-H5.json",
+        "sha256": "d2772dae854d2e00db45aa787492bf43f5ed9c18eb712e0298c14405657448e0"
+      },
+      {
+        "name": "probe-without-H6.json",
+        "sha256": "5d9b8f9df09eb5dad20f9e662194c77a8ef78eb99b6ac7fb938b273e361e213f"
+      }
+    ],
+    "artifact": null,
+    "replay": "node review.mjs replay --from out/local-2234 --scenario {id} --repo <checkout of 9007cee1>"
+  },
+  "method": {
+    "observed": [
+      "6 scenarios chosen by the reviewing agent from the diff and the issue, each run through the real generator, analyzer and run-time serializer on both sides.",
+      "`tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj` on both sides. After: 175 passed, 0 failed. Before (source files reverted, the PR's tests kept): 171 passed, 4 failed. 4 tests changed outcome.",
+      "Built with .NET SDK 9.0.301 on win32 (the repo pins 8.0.402).",
+      "Reviewing agent: `fixture (hand-written agent output with planted mistakes)`, two calls (choose inputs, requirements and the expected symptom; explain the evidence). It cites evidence as pointers; every value quoted next to its words, the trace tables, the cause and effect tags, the test verdicts, the coverage and the rule-made decisions are computed by a script from the recorded runs."
+    ],
+    "downgraded": [
+      "\"Code-only warning: the guard skips a colliding member.\": marked WARNING, but no run or test shows it, so it is shown as a note",
+      "R2: marked met, but no run or test shows it, so it is shown as not shown",
+      "\"A colliding member is skipped rather than added\": marked verified, but its evidence is only code reading, so it is shown as \"holds in the code, not run\""
+    ]
+  },
+  "usage": null
+}

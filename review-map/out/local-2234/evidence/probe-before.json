@@ -1,0 +1,287 @@
+[
+  {
+    "id": "suppressed-valid-control",
+    "title": "Control: valid suppressed type with int keys should be unaffected and use the dynamic resolver",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Plain\n{\n    [Key(0)]\n    public int Id { get; set; }\n    [Key(1)]\n    public string Name { get; set; }\n}\n",
+    "model": [
+      {
+        "target": "App.Plain",
+        "exception": null,
+        "objects": [],
+        "closedGenerics": []
+      }
+    ],
+    "generatorException": null,
+    "generatorDiagnostics": [],
+    "analyzerDiagnostics": [],
+    "sourceErrors": [],
+    "generated": [],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": false,
+      "valuesIn": "Id=41; Name=forty-one",
+      "configs": [
+        {
+          "name": "default options",
+          "error": null,
+          "wire": "[41,\u0022forty-one\u0022]",
+          "byteCount": 12,
+          "valuesOut": "Id=41; Name=forty-one"
+        }
+      ]
+    }
+  },
+  {
+    "id": "suppressed-unkeyed-member",
+    "title": "Suppressed type with a public member lacking [Key] (the issue\u0027s missing-diagnostic case, MsgPack004)",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Loose\n{\n    [Key(0)]\n    public string Name { get; set; }\n    public int Unkeyed { get; set; }\n}\n",
+    "model": [
+      {
+        "target": "App.Loose",
+        "exception": null,
+        "objects": [],
+        "closedGenerics": []
+      }
+    ],
+    "generatorException": null,
+    "generatorDiagnostics": [],
+    "analyzerDiagnostics": [
+      {
+        "id": "MsgPack004",
+        "severity": "Error",
+        "message": "Properties and fields of MessagePackObject-attributed types require either KeyAttribute or IgnoreMemberAttribute: global::App.Loose.Unkeyed",
+        "location": "App.cs:8"
+      }
+    ],
+    "sourceErrors": [],
+    "generated": [],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": false,
+      "valuesIn": "Name=n; Unkeyed=9",
+      "configs": [
+        {
+          "name": "default options",
+          "error": "MessagePackDynamicObjectResolverException: all public members must mark KeyAttribute or IgnoreMemberAttribute. type:App.Loose member:Unkeyed",
+          "wire": null,
+          "byteCount": 0,
+          "valuesOut": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "suppressed-dup-int-keys",
+    "title": "Suppressed type with two properties sharing [Key(0)] (duplicate key, MsgPack005)",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Dup\n{\n    [Key(0)]\n    public string First { get; set; }\n    [Key(0)]\n    public string Second { get; set; }\n}\n",
+    "model": [
+      {
+        "target": "App.Dup",
+        "exception": "ArgumentException",
+        "objects": null,
+        "closedGenerics": null
+      }
+    ],
+    "generatorException": "ArgumentException",
+    "generatorDiagnostics": [
+      {
+        "id": "CS8785",
+        "severity": "Warning",
+        "message": "Generator \u0027MessagePackGenerator\u0027 failed to generate source. It will not contribute to the output and compilation errors may occur as a result. Exception was of type \u0027ArgumentException\u0027 with message \u0027An item with the same key has already been added. Key: 0\u0027.",
+        "location": "(none)"
+      }
+    ],
+    "analyzerDiagnostics": [
+      {
+        "id": "MsgPack005",
+        "severity": "Error",
+        "message": "All KeyAttribute arguments must be unique",
+        "location": "App.cs:8"
+      },
+      {
+        "id": "AD0001",
+        "severity": "Warning",
+        "message": "Analyzer \u0027MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer\u0027 threw an exception of type \u0027System.ArgumentException\u0027 with message \u0027An item with the same key has already been added. Key: 0\u0027.",
+        "location": "(none)"
+      }
+    ],
+    "sourceErrors": [],
+    "generated": [],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": false,
+      "valuesIn": "First=one; Second=two",
+      "configs": [
+        {
+          "name": "default options",
+          "error": "MessagePackDynamicObjectResolverException: key is duplicated, all members key must be unique. type:App.Dup member:Second",
+          "wire": null,
+          "byteCount": 0,
+          "valuesOut": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "generated-dup-string-keys-fields",
+    "title": "Normal generated type with duplicate string keys on public fields (field loop)",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject]\npublic class DupFields\n{\n    [Key(\u0022a\u0022)]\n    public string F1;\n    [Key(\u0022a\u0022)]\n    public int F2;\n}\n",
+    "model": [
+      {
+        "target": "App.DupFields",
+        "exception": "ArgumentException",
+        "objects": null,
+        "closedGenerics": null
+      }
+    ],
+    "generatorException": "ArgumentException",
+    "generatorDiagnostics": [
+      {
+        "id": "CS8785",
+        "severity": "Warning",
+        "message": "Generator \u0027MessagePackGenerator\u0027 failed to generate source. It will not contribute to the output and compilation errors may occur as a result. Exception was of type \u0027ArgumentException\u0027 with message \u0027An item with the same key has already been added. Key: a\u0027.",
+        "location": "(none)"
+      }
+    ],
+    "analyzerDiagnostics": [
+      {
+        "id": "MsgPack005",
+        "severity": "Error",
+        "message": "All KeyAttribute arguments must be unique",
+        "location": "App.cs:9"
+      },
+      {
+        "id": "AD0001",
+        "severity": "Warning",
+        "message": "Analyzer \u0027MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer\u0027 threw an exception of type \u0027System.ArgumentException\u0027 with message \u0027An item with the same key has already been added. Key: a\u0027.",
+        "location": "(none)"
+      }
+    ],
+    "sourceErrors": [],
+    "generated": [],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": false,
+      "valuesIn": "F1=left; F2=77",
+      "configs": [
+        {
+          "name": "default options",
+          "error": "MessagePackDynamicObjectResolverException: key is duplicated, all members key must be unique. type:App.DupFields member:F2",
+          "wire": null,
+          "byteCount": 0,
+          "valuesOut": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "mixed-keys-props-int-first",
+    "title": "Properties with an int key followed by a string key (mixed kinds, MsgPack005)",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject]\npublic class Mixed\n{\n    [Key(0)]\n    public string A { get; set; }\n    [Key(\u0022b\u0022)]\n    public string B { get; set; }\n}\n",
+    "model": [
+      {
+        "target": "App.Mixed",
+        "exception": "InvalidOperationException",
+        "objects": null,
+        "closedGenerics": null
+      }
+    ],
+    "generatorException": "InvalidOperationException",
+    "generatorDiagnostics": [
+      {
+        "id": "CS8785",
+        "severity": "Warning",
+        "message": "Generator \u0027MessagePackGenerator\u0027 failed to generate source. It will not contribute to the output and compilation errors may occur as a result. Exception was of type \u0027InvalidOperationException\u0027 with message \u0027Nullable object must have a value.\u0027.",
+        "location": "(none)"
+      }
+    ],
+    "analyzerDiagnostics": [
+      {
+        "id": "MsgPack005",
+        "severity": "Error",
+        "message": "All KeyAttribute arguments must be of the same type (either string or int)",
+        "location": "App.cs:8"
+      },
+      {
+        "id": "AD0001",
+        "severity": "Warning",
+        "message": "Analyzer \u0027MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer\u0027 threw an exception of type \u0027System.InvalidOperationException\u0027 with message \u0027Nullable object must have a value.\u0027.",
+        "location": "(none)"
+      }
+    ],
+    "sourceErrors": [],
+    "generated": [],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": false,
+      "valuesIn": "A=alpha; B=beta",
+      "configs": [
+        {
+          "name": "default options",
+          "error": "MessagePackDynamicObjectResolverException: all members key type must be same. type: App.Mixed member:B",
+          "wire": null,
+          "byteCount": 0,
+          "valuesOut": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "mixed-keys-fields-string-first",
+    "title": "Public fields with a string key first, then an int key (field loop, opposite order)",
+    "referencedSource": null,
+    "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject]\npublic class MixedFields\n{\n    [Key(\u0022x\u0022)]\n    public string X;\n    [Key(1)]\n    public int Y;\n}\n",
+    "model": [
+      {
+        "target": "App.MixedFields",
+        "exception": "ArgumentNullException",
+        "objects": null,
+        "closedGenerics": null
+      }
+    ],
+    "generatorException": "ArgumentNullException",
+    "generatorDiagnostics": [
+      {
+        "id": "CS8785",
+        "severity": "Warning",
+        "message": "Generator \u0027MessagePackGenerator\u0027 failed to generate source. It will not contribute to the output and compilation errors may occur as a result. Exception was of type \u0027ArgumentNullException\u0027 with message \u0027Value cannot be null. (Parameter \u0027key\u0027)\u0027.",
+        "location": "(none)"
+      }
+    ],
+    "analyzerDiagnostics": [
+      {
+        "id": "MsgPack005",
+        "severity": "Error",
+        "message": "All KeyAttribute arguments must be of the same type (either string or int)",
+        "location": "App.cs:9"
+      },
+      {
+        "id": "AD0001",
+        "severity": "Warning",
+        "message": "Analyzer \u0027MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer\u0027 threw an exception of type \u0027System.ArgumentNullException\u0027 with message \u0027Value cannot be null. (Parameter \u0027key\u0027)\u0027.",
+        "location": "(none)"
+      }
+    ],
+    "sourceErrors": [],
+    "generated": [],
+    "runtime": {
+      "built": true,
+      "generatedResolverPresent": false,
+      "valuesIn": "X=ex; Y=5",
+      "configs": [
+        {
+          "name": "default options",
+          "error": "MessagePackDynamicObjectResolverException: all members key type must be same. type: App.MixedFields member:Y",
+          "wire": null,
+          "byteCount": 0,
+          "valuesOut": null
+        }
+      ]
+    }
+  }
+]

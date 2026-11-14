@@ -1,0 +1,60 @@
+{
+  "understanding": "The PR makes the analyzer keep validating [MessagePackObject(SuppressSourceGeneration = true)] types. In the diff, TypeCollector changes in both the property loop and the field loop. A member whose key kind (int vs string) differs from the others is now skipped with `continue` after MsgPack005 is reported. A duplicate int or string key is no longer added to the dictionary a second time, which used to throw ArgumentException from `Dictionary.Add`. The generator calls TypeCollector with no callback, so these edits can change the model and generated code as well as the analyzer diagnostics. The scenarios cover a valid suppressed type as a control, a suppressed type with an unkeyed member, duplicate int keys on a suppressed type, duplicate string keys on fields, and mixed key kinds on properties and on fields in both orders.",
+  "scenarios": [
+    {
+      "id": "suppressed-valid-control",
+      "title": "Control: valid suppressed type with int keys should be unaffected and use the dynamic resolver",
+      "referencedSource": null,
+      "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Plain\n{\n    [Key(0)]\n    public int Id { get; set; }\n    [Key(1)]\n    public string Name { get; set; }\n}\n",
+      "makeExpression": "new Plain { Id = 41, Name = \"forty-one\" }",
+      "describeExpression": "$\"Id={((Plain)o).Id}; Name={((Plain)o).Name}\"",
+      "why": "Shows that a valid suppressed type yields the same model, no diagnostics and the same dynamic round-trip before and after, with no generated formatter."
+    },
+    {
+      "id": "suppressed-unkeyed-member",
+      "title": "Suppressed type with a public member lacking [Key] (the issue's missing-diagnostic case, MsgPack004)",
+      "referencedSource": null,
+      "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Loose\n{\n    [Key(0)]\n    public string Name { get; set; }\n    public int Unkeyed { get; set; }\n}\n",
+      "makeExpression": "new Loose { Name = \"n\", Unkeyed = 9 }",
+      "describeExpression": "$\"Name={((Loose)o).Name}; Unkeyed={((Loose)o).Unkeyed}\"",
+      "why": "Shows whether MsgPack004 appears in diagnostics for a suppressed type after the change and not before, and whether the build fails."
+    },
+    {
+      "id": "suppressed-dup-int-keys",
+      "title": "Suppressed type with two properties sharing [Key(0)] (duplicate key, MsgPack005)",
+      "referencedSource": null,
+      "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Dup\n{\n    [Key(0)]\n    public string First { get; set; }\n    [Key(0)]\n    public string Second { get; set; }\n}\n",
+      "makeExpression": "new Dup { First = \"one\", Second = \"two\" }",
+      "describeExpression": "$\"First={((Dup)o).First}; Second={((Dup)o).Second}\"",
+      "why": "Shows the model step throwing ArgumentException on the duplicate key before the change, and MsgPack005 reported with the duplicate skipped after it."
+    },
+    {
+      "id": "generated-dup-string-keys-fields",
+      "title": "Normal generated type with duplicate string keys on public fields (field loop)",
+      "referencedSource": null,
+      "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject]\npublic class DupFields\n{\n    [Key(\"a\")]\n    public string F1;\n    [Key(\"a\")]\n    public int F2;\n}\n",
+      "makeExpression": "new DupFields { F1 = \"left\", F2 = 77 }",
+      "describeExpression": "$\"F1={((DupFields)o).F1}; F2={((DupFields)o).F2}\"",
+      "why": "Reaches the duplicate string-key guard in the field loop on a non-suppressed type, showing model and generated output when the second member is dropped."
+    },
+    {
+      "id": "mixed-keys-props-int-first",
+      "title": "Properties with an int key followed by a string key (mixed kinds, MsgPack005)",
+      "referencedSource": null,
+      "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject]\npublic class Mixed\n{\n    [Key(0)]\n    public string A { get; set; }\n    [Key(\"b\")]\n    public string B { get; set; }\n}\n",
+      "makeExpression": "new Mixed { A = \"alpha\", B = \"beta\" }",
+      "describeExpression": "$\"A={((Mixed)o).A}; B={((Mixed)o).B}\"",
+      "why": "Shows the new `continue` on mixed key kinds, so the model and generated code drop B after the change while the diagnostic is still reported."
+    },
+    {
+      "id": "mixed-keys-fields-string-first",
+      "title": "Public fields with a string key first, then an int key (field loop, opposite order)",
+      "referencedSource": null,
+      "projectSource": "using MessagePack;\nnamespace App;\n[MessagePackObject]\npublic class MixedFields\n{\n    [Key(\"x\")]\n    public string X;\n    [Key(1)]\n    public int Y;\n}\n",
+      "makeExpression": "new MixedFields { X = \"ex\", Y = 5 }",
+      "describeExpression": "$\"X={((MixedFields)o).X}; Y={((MixedFields)o).Y}\"",
+      "why": "Reaches the mixed-key `continue` in the field loop with the reverse key order, which the author's tests do not cover."
+    }
+  ],
+  "model": "claude-sonnet-5-5"
+}

@@ -1,0 +1,2445 @@
+{
+  "pr": {
+    "title": "implementation for #2283",
+    "branch": "ju26-issue-2283",
+    "head": "9df83c38",
+    "headFull": "9df83c38409c8bfad0517aebffe48211eda4a5b4",
+    "base": "32258fdb",
+    "blob": "https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4",
+    "noLinkRepos": [
+      "MessagePack-CSharp/MessagePack-CSharp"
+    ],
+    "generatedBy": "Written by a reviewing agent that did not write this change, working by hand from the recorded runs; every value next to its words is quoted by the review-map script.",
+    "issueRef": "MessagePack-CSharp#2283"
+  },
+  "replay": "node .review-map/review.mjs replay --from .review-map/evidence/2283 --scenario {id} --repo <checkout of 9df83c38>",
+  "summary": [
+    {
+      "sentence": "Fixes upstream issue `MessagePack-CSharp#2283`: the source generator and the analyzer no longer crash when one of your types has a member whose type is a generic struct from a referenced assembly.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "model",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ① Model: before `throws IndexOutOfRangeException` → after `Cmd: Scope, Member; Item<T>: Key`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "① Model",
+              "side": "both",
+              "differs": true,
+              "before": "throws IndexOutOfRangeException",
+              "after": "Cmd: Scope, Member; Item<T>: Key"
+            },
+            "short": "[`issue-repro` ①](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "test",
+          "test": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference",
+          "expects": "fails-before-passes-after",
+          "resolved": {
+            "ok": true,
+            "quote": "test `GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference`: before Failed → after Passed",
+            "data": {
+              "kind": "test",
+              "name": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference",
+              "before": "Failed",
+              "after": "Passed"
+            },
+            "short": "test `ClosedGenericStruct_FromMetadataReference`"
+          }
+        }
+      ]
+    },
+    {
+      "sentence": "The crash fix works: the issue's repro now gets a generated resolver and formatters, and its bytes on the wire are unchanged.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "generated",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ③ C# files: before `0 files` → after `3 files`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "③ C# files",
+              "side": "both",
+              "differs": true,
+              "before": "0 files",
+              "after": "3 files"
+            },
+            "short": "[`issue-repro` ③](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "rtDefault",
+          "side": "both",
+          "expects": "same",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ④ Run time, default: `out Scope=s; Member.Key=k (intact)` on both sides",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "④ Run time, default",
+              "side": "both",
+              "differs": false,
+              "before": "out Scope=s; Member.Key=k (intact)",
+              "after": "out Scope=s; Member.Key=k (intact)"
+            },
+            "short": "[`issue-repro` ④](#user-content-trace-issue-repro)"
+          }
+        }
+      ]
+    },
+    {
+      "sentence": "The PR also does a second thing the issue did not ask for: it stops reporting problems found in referenced types, which turns an existing build error into silence and lets a formatter that drops a value ship.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ② Diagnostics: before `MsgPack004 ×2, build fails` → after `none, build passes`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": true,
+              "before": "MsgPack004 ×2, build fails",
+              "after": "none, build passes"
+            },
+            "short": "[`ref-class-unkeyed` ②](#user-content-trace-ref-class-unkeyed)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "rtGenerated",
+          "side": "both",
+          "expects": "same",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ④ Run time, generated code: `out Name=a; Unkeyed=0 ⚠️ value changed` on both sides",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "④ Run time, generated code",
+              "side": "both",
+              "differs": false,
+              "before": "out Name=a; Unkeyed=0 ⚠️ value changed",
+              "after": "out Name=a; Unkeyed=0 ⚠️ value changed"
+            },
+            "short": "[`ref-class-unkeyed` ④](#user-content-trace-ref-class-unkeyed)"
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "src",
+      "label": "Your types",
+      "sub": "have source code",
+      "status": "same"
+    },
+    {
+      "id": "ref",
+      "label": "Referenced types",
+      "sub": "compiled, no source",
+      "status": "same"
+    },
+    {
+      "id": "tc",
+      "label": "TypeCollector",
+      "sub": "analysis stage · +26 −3",
+      "status": "changed"
+    },
+    {
+      "id": "an",
+      "label": "Build diagnostics",
+      "sub": "what the analyzer reports",
+      "status": "affected"
+    },
+    {
+      "id": "tpl",
+      "label": "Templates",
+      "sub": "turn the model into C#",
+      "status": "same"
+    },
+    {
+      "id": "gen",
+      "label": "Generated code",
+      "sub": "resolver and formatters",
+      "status": "affected"
+    },
+    {
+      "id": "rt",
+      "label": "Your app at run time",
+      "sub": "serializes real data",
+      "status": "affected"
+    }
+  ],
+  "edges": [
+    {
+      "from": "src",
+      "to": "tc",
+      "label": null,
+      "changed": false
+    },
+    {
+      "from": "ref",
+      "to": "tc",
+      "label": "crashed here",
+      "changed": false
+    },
+    {
+      "from": "tc",
+      "to": "tpl",
+      "label": "① model",
+      "changed": true
+    },
+    {
+      "from": "tc",
+      "to": "an",
+      "label": "② diagnostics",
+      "changed": true
+    },
+    {
+      "from": "tpl",
+      "to": "gen",
+      "label": "③ C# files",
+      "changed": true
+    },
+    {
+      "from": "gen",
+      "to": "rt",
+      "label": "④ bytes",
+      "changed": true
+    }
+  ],
+  "units": [
+    {
+      "name": "Diagnostics sink (TypeCollector constructor)",
+      "status": "changed",
+      "where": "[`TypeCollector.cs` line 239](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L239)",
+      "receives": "The analyzer's \"report a diagnostic\" callback. It is `null` when the generator is the caller, so this unit only matters on the analyzer path.",
+      "emits": "The callback that every report site in `TypeCollector` uses.",
+      "change": "The callback is now wrapped in a filter. Before, every diagnostic went straight through.",
+      "examples": [
+        {
+          "note": "Unkeyed public property on a referenced generic class: the error is no longer reported.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "handoff": "diagnostics",
+              "side": "both",
+              "expects": "differs",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-ref-class-unkeyed",
+                "quote": "`ref-class-unkeyed` ② Diagnostics: before `MsgPack004 ×2, build fails` → after `none, build passes`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "ref-class-unkeyed",
+                  "node": "② Diagnostics",
+                  "side": "both",
+                  "differs": true,
+                  "before": "MsgPack004 ×2, build fails",
+                  "after": "none, build passes"
+                },
+                "short": "[`ref-class-unkeyed` ②](#user-content-trace-ref-class-unkeyed)"
+              }
+            }
+          ]
+        },
+        {
+          "note": "The same on a referenced generic struct, where the analyzer used to crash right after reporting.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "ref-struct-unkeyed",
+              "handoff": "diagnostics",
+              "side": "both",
+              "expects": "differs",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-ref-struct-unkeyed",
+                "quote": "`ref-struct-unkeyed` ② Diagnostics: before `CS8785, MsgPack004, AD0001, build fails` → after `none, build passes`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "ref-struct-unkeyed",
+                  "node": "② Diagnostics",
+                  "side": "both",
+                  "differs": true,
+                  "before": "CS8785, MsgPack004, AD0001, build fails",
+                  "after": "none, build passes"
+                },
+                "short": "[`ref-struct-unkeyed` ②](#user-content-trace-ref-struct-unkeyed)"
+              }
+            }
+          ]
+        },
+        {
+          "note": "The same unkeyed property on a type declared in your own project: reported as before.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "source-unkeyed-control",
+              "handoff": "diagnostics",
+              "side": "both",
+              "expects": "same",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-source-unkeyed-control",
+                "quote": "`source-unkeyed-control` ② Diagnostics: `MsgPack004 ×3, build fails` on both sides",
+                "data": {
+                  "kind": "run",
+                  "scenario": "source-unkeyed-control",
+                  "node": "② Diagnostics",
+                  "side": "both",
+                  "differs": false,
+                  "before": "MsgPack004 ×3, build fails",
+                  "after": "MsgPack004 ×3, build fails"
+                },
+                "short": "[`source-unkeyed-control` ②](#user-content-trace-source-unkeyed-control)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReportIfLocatedInCompilation (new)",
+      "status": "changed",
+      "where": "[`TypeCollector.cs` lines 1444–1450](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1444-L1450)",
+      "receives": "One diagnostic.",
+      "emits": "Forwards it only if its location is in a source file of the project being compiled; otherwise drops it.",
+      "change": "New method. This is the filter.",
+      "examples": [
+        {
+          "note": "A diagnostic located in your project is forwarded.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "source-unkeyed-control",
+              "handoff": "diagnostics",
+              "side": "after",
+              "expects": "any",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-source-unkeyed-control",
+                "quote": "`source-unkeyed-control` ② Diagnostics, after: `MsgPack004 ×3, build fails`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "source-unkeyed-control",
+                  "node": "② Diagnostics",
+                  "side": "after",
+                  "value": "MsgPack004 ×3, build fails"
+                },
+                "short": "[`source-unkeyed-control` ② after](#user-content-trace-source-unkeyed-control)"
+              }
+            }
+          ]
+        },
+        {
+          "note": "A diagnostic with no location is dropped.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "handoff": "diagnostics",
+              "side": "both",
+              "expects": "differs",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-ref-class-unkeyed",
+                "quote": "`ref-class-unkeyed` ② Diagnostics: before `MsgPack004 ×2, build fails` → after `none, build passes`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "ref-class-unkeyed",
+                  "node": "② Diagnostics",
+                  "side": "both",
+                  "differs": true,
+                  "before": "MsgPack004 ×2, build fails",
+                  "after": "none, build passes"
+                },
+                "short": "[`ref-class-unkeyed` ②](#user-content-trace-ref-class-unkeyed)"
+              }
+            }
+          ]
+        },
+        {
+          "note": "A diagnostic located in another project's source file (an IDE with project references) is dropped too, by reading the condition; no test or scenario exercises this.",
+          "refs": [
+            {
+              "kind": "code",
+              "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+              "startLine": 1446,
+              "endLine": 1446,
+              "resolved": {
+                "ok": true,
+                "quote": "[TypeCollector.cs line 1446](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1446): `if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.Sourc…`",
+                "data": {
+                  "kind": "code",
+                  "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+                  "where": "TypeCollector.cs line 1446",
+                  "url": "https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1446",
+                  "start": 1446,
+                  "lines": [
+                    "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))"
+                  ]
+                },
+                "short": "[TypeCollector.cs line 1446](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1446)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "GetObjectInfo, member loop",
+      "status": "changed",
+      "where": "[line 985](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L985) and [line 1077](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1077), plus the new helper `GetPropertyIdentifierLocation` at line 1434",
+      "receives": "One type and its members. The type may come from a referenced assembly, in which case its members have no source code to point at.",
+      "emits": "The serialization model for that type (which members, which keys), and diagnostics for members that break the rules.",
+      "change": "Two places looked up \"the first source declaration\" with `[0]`, which throws when there is none. Both now return no location instead. The per-hunk builds show only the second one (line 1077) is needed for the crash on these inputs.",
+      "examples": [
+        {
+          "note": "The issue's repro: the collector used to throw, now returns a model.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "handoff": "model",
+              "side": "both",
+              "expects": "differs",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-issue-repro",
+                "quote": "`issue-repro` ① Model: before `throws IndexOutOfRangeException` → after `Cmd: Scope, Member; Item<T>: Key`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "issue-repro",
+                  "node": "① Model",
+                  "side": "both",
+                  "differs": true,
+                  "before": "throws IndexOutOfRangeException",
+                  "after": "Cmd: Scope, Member; Item<T>: Key"
+                },
+                "short": "[`issue-repro` ①](#user-content-trace-issue-repro)"
+              }
+            },
+            {
+              "kind": "test",
+              "test": "GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference",
+              "expects": "fails-before-passes-after",
+              "resolved": {
+                "ok": true,
+                "quote": "test `GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference`: before Failed → after Passed",
+                "data": {
+                  "kind": "test",
+                  "name": "GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference",
+                  "before": "Failed",
+                  "after": "Passed"
+                },
+                "short": "test `ClosedGenericRecordStruct_FromMetadataReference`"
+              }
+            }
+          ]
+        },
+        {
+          "note": "Without line 1077 the crash comes back; without line 985 nothing changes.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "handoff": "model",
+              "side": "without-H3",
+              "expects": "any",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-issue-repro",
+                "quote": "`issue-repro` ① Model, without TypeCollector.cs 1077: `throws IndexOutOfRangeException`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "issue-repro",
+                  "node": "① Model",
+                  "side": "extra",
+                  "label": "without TypeCollector.cs 1077",
+                  "value": "throws IndexOutOfRangeException"
+                },
+                "short": "[`issue-repro` ① without TypeCollector.cs 1077](#user-content-trace-issue-repro)"
+              }
+            },
+            {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "handoff": "model",
+              "side": "without-H2",
+              "expects": "any",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-issue-repro",
+                "quote": "`issue-repro` ① Model, without TypeCollector.cs 985: `Cmd: Scope, Member; Item<T>: Key`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "issue-repro",
+                  "node": "① Model",
+                  "side": "extra",
+                  "label": "without TypeCollector.cs 985",
+                  "value": "Cmd: Scope, Member; Item<T>: Key"
+                },
+                "short": "[`issue-repro` ① without TypeCollector.cs 985](#user-content-trace-issue-repro)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Templates",
+      "status": "same",
+      "receives": "The serialization model. After this PR it can contain generic structs from referenced assemblies, which never reached this stage before.",
+      "emits": "C# source text for formatters and the resolver.",
+      "change": "No code change. It handles the new input.",
+      "examples": [
+        {
+          "note": "The issue's repro reaches the templates for the first time and comes out as files.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "handoff": "generated",
+              "side": "both",
+              "expects": "differs",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-issue-repro",
+                "quote": "`issue-repro` ③ C# files: before `0 files` → after `3 files`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "issue-repro",
+                  "node": "③ C# files",
+                  "side": "both",
+                  "differs": true,
+                  "before": "0 files",
+                  "after": "3 files"
+                },
+                "short": "[`issue-repro` ③](#user-content-trace-issue-repro)"
+              }
+            }
+          ]
+        }
+      ],
+      "where": null
+    },
+    {
+      "name": "Generated resolver and formatters, at run time",
+      "status": "affected",
+      "receives": "Your objects, and whichever formatter the resolver hands out for their types.",
+      "emits": "MessagePack bytes, and objects read back from them.",
+      "change": "No code change here. Output exists where there was none.",
+      "examples": [
+        {
+          "note": "The issue's repro round-trips through the new generated formatter.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "handoff": "rtGenerated",
+              "side": "both",
+              "expects": "differs",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-issue-repro",
+                "quote": "`issue-repro` ④ Run time, generated code: before `no generated resolver` → after `out Scope=s; Member.Key=k (intact)`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "issue-repro",
+                  "node": "④ Run time, generated code",
+                  "side": "both",
+                  "differs": true,
+                  "before": "no generated resolver",
+                  "after": "out Scope=s; Member.Key=k (intact)"
+                },
+                "short": "[`issue-repro` ④](#user-content-trace-issue-repro)"
+              }
+            }
+          ]
+        },
+        {
+          "note": "A referenced generic struct with an unkeyed member: the formatter now exists and loses that member's value.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "ref-struct-unkeyed",
+              "handoff": "rtGenerated",
+              "side": "both",
+              "expects": "differs",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-ref-struct-unkeyed",
+                "quote": "`ref-struct-unkeyed` ④ Run time, generated code: before `no generated resolver` → after `out Name=a; Unkeyed=0 ⚠️ value changed`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "ref-struct-unkeyed",
+                  "node": "④ Run time, generated code",
+                  "side": "both",
+                  "differs": true,
+                  "before": "no generated resolver",
+                  "after": "out Name=a; Unkeyed=0 ⚠️ value changed"
+                },
+                "short": "[`ref-struct-unkeyed` ④](#user-content-trace-ref-struct-unkeyed)"
+              }
+            }
+          ]
+        },
+        {
+          "note": "The same on a referenced generic class: the value was lost before too, but the build used to fail.",
+          "refs": [
+            {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "handoff": "rtGenerated",
+              "side": "both",
+              "expects": "same",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-ref-class-unkeyed",
+                "quote": "`ref-class-unkeyed` ④ Run time, generated code: `out Name=a; Unkeyed=0 ⚠️ value changed` on both sides",
+                "data": {
+                  "kind": "run",
+                  "scenario": "ref-class-unkeyed",
+                  "node": "④ Run time, generated code",
+                  "side": "both",
+                  "differs": false,
+                  "before": "out Name=a; Unkeyed=0 ⚠️ value changed",
+                  "after": "out Name=a; Unkeyed=0 ⚠️ value changed"
+                },
+                "short": "[`ref-class-unkeyed` ④](#user-content-trace-ref-class-unkeyed)"
+              }
+            },
+            {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "handoff": "diagnostics",
+              "side": "both",
+              "expects": "differs",
+              "resolved": {
+                "ok": true,
+                "anchor": "trace-ref-class-unkeyed",
+                "quote": "`ref-class-unkeyed` ② Diagnostics: before `MsgPack004 ×2, build fails` → after `none, build passes`",
+                "data": {
+                  "kind": "run",
+                  "scenario": "ref-class-unkeyed",
+                  "node": "② Diagnostics",
+                  "side": "both",
+                  "differs": true,
+                  "before": "MsgPack004 ×2, build fails",
+                  "after": "none, build passes"
+                },
+                "short": "[`ref-class-unkeyed` ②](#user-content-trace-ref-class-unkeyed)"
+              }
+            }
+          ]
+        }
+      ],
+      "where": null
+    }
+  ],
+  "claims": [
+    {
+      "claim": "Closed generic types from a referenced assembly can be used as members, including generic value types and record structs.",
+      "source": "README.md",
+      "verdict": "verified",
+      "evidence": "The issue's repro crashed before and gets generated code after.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "model",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ① Model: before `throws IndexOutOfRangeException` → after `Cmd: Scope, Member; Item<T>: Key`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "① Model",
+              "side": "both",
+              "differs": true,
+              "before": "throws IndexOutOfRangeException",
+              "after": "Cmd: Scope, Member; Item<T>: Key"
+            },
+            "short": "[`issue-repro` ①](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "test",
+          "test": "GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference",
+          "expects": "fails-before-passes-after",
+          "resolved": {
+            "ok": true,
+            "quote": "test `GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference`: before Failed → after Passed",
+            "data": {
+              "kind": "test",
+              "name": "GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference",
+              "before": "Failed",
+              "after": "Passed"
+            },
+            "short": "test `ClosedGenericRecordStruct_FromMetadataReference`"
+          }
+        }
+      ]
+    },
+    {
+      "claim": "Diagnostics about the members of such a type are reported by the assembly that defines it.",
+      "source": "README.md, MsgPack004.md, code comment",
+      "verdict": "partly",
+      "evidence": "Only if that assembly is itself built with the MessagePack analyzer. For a package you do not build, nobody reports it.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ② Diagnostics: before `MsgPack004 ×2, build fails` → after `none, build passes`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": true,
+              "before": "MsgPack004 ×2, build fails",
+              "after": "none, build passes"
+            },
+            "short": "[`ref-class-unkeyed` ②](#user-content-trace-ref-class-unkeyed)"
+          }
+        }
+      ]
+    },
+    {
+      "claim": "This analyzer only reports on members declared in the project being compiled.",
+      "source": "MsgPack004.md",
+      "verdict": "verified",
+      "evidence": "Holds after the PR, but it is written as a description and is in fact new behaviour: before, the error was reported for a referenced generic class.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ② Diagnostics: before `MsgPack004 ×2, build fails` → after `none, build passes`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": true,
+              "before": "MsgPack004 ×2, build fails",
+              "after": "none, build passes"
+            },
+            "short": "[`ref-class-unkeyed` ②](#user-content-trace-ref-class-unkeyed)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "source-unkeyed-control",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "same",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-source-unkeyed-control",
+            "quote": "`source-unkeyed-control` ② Diagnostics: `MsgPack004 ×3, build fails` on both sides",
+            "data": {
+              "kind": "run",
+              "scenario": "source-unkeyed-control",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": false,
+              "before": "MsgPack004 ×3, build fails",
+              "after": "MsgPack004 ×3, build fails"
+            },
+            "short": "[`source-unkeyed-control` ②](#user-content-trace-source-unkeyed-control)"
+          }
+        }
+      ]
+    },
+    {
+      "claim": "Reporting against a location that does not exist is something analyzers are not permitted to do.",
+      "source": "Code comment on the new filter",
+      "verdict": "partly",
+      "evidence": "Before this PR a location-less error was reported and accepted. The restriction concerns locations in another project's files, which nothing in this PR tests.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "diagnostics",
+          "side": "before",
+          "expects": "any",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ② Diagnostics, before: `MsgPack004 ×2, build fails`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "② Diagnostics",
+              "side": "before",
+              "value": "MsgPack004 ×2, build fails"
+            },
+            "short": "[`ref-class-unkeyed` ② before](#user-content-trace-ref-class-unkeyed)"
+          }
+        },
+        {
+          "kind": "code",
+          "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "startLine": 1440,
+          "endLine": 1442,
+          "resolved": {
+            "ok": true,
+            "quote": "[TypeCollector.cs lines 1440–1442](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1440-L1442): `/// Types and members that come from metadata (or from another compilation) have no location in the…`",
+            "data": {
+              "kind": "code",
+              "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+              "where": "TypeCollector.cs lines 1440–1442",
+              "url": "https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1440-L1442",
+              "start": 1440,
+              "lines": [
+                "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed.",
+                "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported",
+                "    /// against a location that does not exist, which analyzers are not permitted to do."
+              ]
+            },
+            "short": "[TypeCollector.cs lines 1440–1442](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1440-L1442)"
+          }
+        }
+      ]
+    },
+    {
+      "claim": "The change does not crash the generator or the analyzer on these inputs.",
+      "source": "Doc comments on the 3 new tests",
+      "verdict": "verified",
+      "evidence": "The 3 tests fail on the old code and pass with the change.",
+      "refs": [
+        {
+          "kind": "test",
+          "test": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference",
+          "expects": "fails-before-passes-after",
+          "resolved": {
+            "ok": true,
+            "quote": "test `GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference`: before Failed → after Passed",
+            "data": {
+              "kind": "test",
+              "name": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference",
+              "before": "Failed",
+              "after": "Passed"
+            },
+            "short": "test `ClosedGenericStruct_FromMetadataReference`"
+          }
+        },
+        {
+          "kind": "test",
+          "test": "GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference",
+          "expects": "fails-before-passes-after",
+          "resolved": {
+            "ok": true,
+            "quote": "test `GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference`: before Failed → after Passed",
+            "data": {
+              "kind": "test",
+              "name": "GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference",
+              "before": "Failed",
+              "after": "Passed"
+            },
+            "short": "test `ClosedGenericRecordStruct_FromMetadataReference`"
+          }
+        },
+        {
+          "kind": "test",
+          "test": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference_UnkeyedMember",
+          "expects": "fails-before-passes-after",
+          "resolved": {
+            "ok": true,
+            "quote": "test `GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference_UnkeyedMember`: before Failed → after Passed",
+            "data": {
+              "kind": "test",
+              "name": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference_UnkeyedMember",
+              "before": "Failed",
+              "after": "Passed"
+            },
+            "short": "test `ClosedGenericStruct_FromMetadataReference_UnkeyedMember`"
+          }
+        }
+      ]
+    },
+    {
+      "claim": "This is the implementation for the issue.",
+      "source": "Commit message",
+      "verdict": "partly",
+      "evidence": "The issue's expected behaviour is met. The PR also changes diagnostic reporting, which the issue did not request.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "generated",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ③ C# files: before `0 files` → after `3 files`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "③ C# files",
+              "side": "both",
+              "differs": true,
+              "before": "0 files",
+              "after": "3 files"
+            },
+            "short": "[`issue-repro` ③](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ② Diagnostics: before `MsgPack004 ×2, build fails` → after `none, build passes`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": true,
+              "before": "MsgPack004 ×2, build fails",
+              "after": "none, build passes"
+            },
+            "short": "[`ref-class-unkeyed` ②](#user-content-trace-ref-class-unkeyed)"
+          }
+        }
+      ]
+    }
+  ],
+  "method": {
+    "observed": [
+      "4 scenarios written by the reviewer: the issue's repro, a referenced generic struct with an unkeyed member, a referenced generic class with an unkeyed member, and the same type declared in-project as a control. Each fed through the real generator, analyzer and run-time serializer on both sides.",
+      "`MessagePack.SourceGenerator.Tests` on both sides: after, 170 passed, 0 failed; before (source files reverted, the PR's tests kept), 167 passed, 3 failed.",
+      "Per-hunk builds by the script: the PR rebuilt with each part removed (5 builds, one group formed from compiler errors), every input run through each. The run without line 239 is the same experiment as the earlier manual what-if and matches it at every hand-off.",
+      "Run-time step: each scenario compiles the project together with the generated code, loads it, serializes one real object, converts the bytes to JSON and reads the object back, with default options and with the generated resolver placed first.",
+      "Every value quoted next to the reviewer's words, the trace tables, the cause and effect tags, the test verdicts and the coverage are computed by a script from the recorded runs."
+    ],
+    "downgraded": []
+  },
+  "traces": {
+    "evidence": "../evidence/2283",
+    "adapter": "messagepack",
+    "cases": [
+      {
+        "id": "ref-class-unkeyed",
+        "title": "Case 1 · Referenced generic class with an unkeyed member (the warning above)",
+        "where": {
+          "diagnostics": "new filter, `TypeCollector.cs` line 239"
+        },
+        "story": "**Cause and effect:** the model, the generated files and the run-time behaviour are identical on both sides. The only hand-off that differs is ②: the filter removes the error. So the same formatter that loses `Unkeyed` used to be blocked by a failing build and now ships."
+      },
+      {
+        "id": "issue-repro",
+        "title": "Case 2 · The issue's repro",
+        "where": {
+          "model": "null-safe lookups, `TypeCollector.cs` lines 985 and 1077"
+        },
+        "story": "**Cause and effect:** the crash at ① is gone, so the warnings at ② disappear and files appear at ③. At run time with default options nothing changes, because the library's run-time fallback was already handling this type. What is new is the last row: a generated formatter now exists for setups that cannot use the fallback."
+      },
+      {
+        "id": "ref-struct-unkeyed",
+        "title": "Case 3 · Referenced generic struct with an unkeyed member",
+        "where": {
+          "model": "null-safe lookups, lines 985 and 1077",
+          "diagnostics": "new filter, line 239"
+        },
+        "story": "**Cause and effect:** two causes act here. The crash fix at ① makes the generator produce files. The filter at ② removes the `MsgPack004` error that was reported just before the crash. Together they turn a failing build into a passing one that drops `Unkeyed`."
+      },
+      {
+        "id": "source-unkeyed-control",
+        "title": "Case 4 · Control: the same type declared in your own project",
+        "story": "**Nothing differs at any hand-off.** This is the evidence that the PR leaves in-project types alone: the build still fails with `MsgPack004` pointing at the member."
+      }
+    ]
+  },
+  "found": [
+    {
+      "severity": "WARNING",
+      "statement": "For a referenced generic type with an unkeyed member, the `MsgPack004` build error is gone, and the formatter that now ships loses that member's value.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ② Diagnostics: before `MsgPack004 ×2, build fails` → after `none, build passes`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": true,
+              "before": "MsgPack004 ×2, build fails",
+              "after": "none, build passes"
+            },
+            "short": "[`ref-class-unkeyed` ②](#user-content-trace-ref-class-unkeyed)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "rtGenerated",
+          "side": "after",
+          "expects": "any",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ④ Run time, generated code, after: `out Name=a; Unkeyed=0 ⚠️ value changed`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "④ Run time, generated code",
+              "side": "after",
+              "value": "out Name=a; Unkeyed=0 ⚠️ value changed"
+            },
+            "short": "[`ref-class-unkeyed` ④ after](#user-content-trace-ref-class-unkeyed)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "generated",
+          "side": "both",
+          "expects": "same",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ③ C# files: `3 files` on both sides",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "③ C# files",
+              "side": "both",
+              "differs": false,
+              "before": "3 files",
+              "after": "3 files"
+            },
+            "short": "[`ref-class-unkeyed` ③](#user-content-trace-ref-class-unkeyed)"
+          }
+        }
+      ]
+    },
+    {
+      "severity": "IMPORTANT",
+      "statement": "The crash fix does not need the new filter: the PR built without the filter line still generates code for the issue's repro and still reports `MsgPack004` for the referenced class.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "generated",
+          "side": "without-H1",
+          "expects": "any",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ③ C# files, without TypeCollector.cs 239: `3 files`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "③ C# files",
+              "side": "extra",
+              "label": "without TypeCollector.cs 239",
+              "value": "3 files"
+            },
+            "short": "[`issue-repro` ③ without TypeCollector.cs 239](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "model",
+          "side": "without-H1",
+          "expects": "any",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ① Model, without TypeCollector.cs 239: `Cmd: Scope, Member; Item<T>: Key`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "① Model",
+              "side": "extra",
+              "label": "without TypeCollector.cs 239",
+              "value": "Cmd: Scope, Member; Item<T>: Key"
+            },
+            "short": "[`issue-repro` ① without TypeCollector.cs 239](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "diagnostics",
+          "side": "without-H1",
+          "expects": "any",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ② Diagnostics, without TypeCollector.cs 239: `MsgPack004 ×2, build fails`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "② Diagnostics",
+              "side": "extra",
+              "label": "without TypeCollector.cs 239",
+              "value": "MsgPack004 ×2, build fails"
+            },
+            "short": "[`ref-class-unkeyed` ② without TypeCollector.cs 239](#user-content-trace-ref-class-unkeyed)"
+          }
+        }
+      ]
+    },
+    {
+      "severity": "IMPORTANT",
+      "statement": "The crash is fixed: the issue's repro used to throw in the type collector and now gets a model and generated code.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "model",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ① Model: before `throws IndexOutOfRangeException` → after `Cmd: Scope, Member; Item<T>: Key`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "① Model",
+              "side": "both",
+              "differs": true,
+              "before": "throws IndexOutOfRangeException",
+              "after": "Cmd: Scope, Member; Item<T>: Key"
+            },
+            "short": "[`issue-repro` ①](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "generated",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ③ C# files: before `0 files` → after `3 files`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "③ C# files",
+              "side": "both",
+              "differs": true,
+              "before": "0 files",
+              "after": "3 files"
+            },
+            "short": "[`issue-repro` ③](#user-content-trace-issue-repro)"
+          }
+        }
+      ]
+    },
+    {
+      "severity": "IMPORTANT",
+      "statement": "Only one of the two null-safe lookups is the crash fix: without line 1077 the issue's repro throws again, while without line 985 every input gives the same result, so no input here shows what the second lookup changes.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "model",
+          "side": "without-H3",
+          "expects": "any",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ① Model, without TypeCollector.cs 1077: `throws IndexOutOfRangeException`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "① Model",
+              "side": "extra",
+              "label": "without TypeCollector.cs 1077",
+              "value": "throws IndexOutOfRangeException"
+            },
+            "short": "[`issue-repro` ① without TypeCollector.cs 1077](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "model",
+          "side": "without-H2",
+          "expects": "any",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ① Model, without TypeCollector.cs 985: `Cmd: Scope, Member; Item<T>: Key`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "① Model",
+              "side": "extra",
+              "label": "without TypeCollector.cs 985",
+              "value": "Cmd: Scope, Member; Item<T>: Key"
+            },
+            "short": "[`issue-repro` ① without TypeCollector.cs 985](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "ref-struct-unkeyed",
+          "handoff": "model",
+          "side": "without-H3",
+          "expects": "any",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-struct-unkeyed",
+            "quote": "`ref-struct-unkeyed` ① Model, without TypeCollector.cs 1077: `throws IndexOutOfRangeException`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-struct-unkeyed",
+              "node": "① Model",
+              "side": "extra",
+              "label": "without TypeCollector.cs 1077",
+              "value": "throws IndexOutOfRangeException"
+            },
+            "short": "[`ref-struct-unkeyed` ① without TypeCollector.cs 1077](#user-content-trace-ref-struct-unkeyed)"
+          }
+        }
+      ]
+    },
+    {
+      "severity": "NOTE",
+      "statement": "You can stop worrying about the wire format of the issue's repro and about diagnostics for your own types: both are identical before and after.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "rtDefault",
+          "side": "both",
+          "expects": "same",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ④ Run time, default: `out Scope=s; Member.Key=k (intact)` on both sides",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "④ Run time, default",
+              "side": "both",
+              "differs": false,
+              "before": "out Scope=s; Member.Key=k (intact)",
+              "after": "out Scope=s; Member.Key=k (intact)"
+            },
+            "short": "[`issue-repro` ④](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "source-unkeyed-control",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "same",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-source-unkeyed-control",
+            "quote": "`source-unkeyed-control` ② Diagnostics: `MsgPack004 ×3, build fails` on both sides",
+            "data": {
+              "kind": "run",
+              "scenario": "source-unkeyed-control",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": false,
+              "before": "MsgPack004 ×3, build fails",
+              "after": "MsgPack004 ×3, build fails"
+            },
+            "short": "[`source-unkeyed-control` ②](#user-content-trace-source-unkeyed-control)"
+          }
+        }
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "question": "Should problems found inside referenced types stop being reported?",
+      "reason": "intent",
+      "detail": "The issue asks only for no crash and a generated resolver. The PR also drops every diagnostic located outside the project being compiled, which silences `MsgPack004` for referenced generic types; the author's third test asserts that silence as expected.",
+      "wouldSettleIt": "A maintainer's statement of the reporting policy for types from packages the user does not build.",
+      "options": [
+        "Keep the silence: the assembly that defines the type reports it, if it is built with the analyzer",
+        "Keep only the crash fix and drop the filter",
+        "Report such problems as a warning on the member that uses the type"
+      ],
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "ref-class-unkeyed",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-class-unkeyed",
+            "quote": "`ref-class-unkeyed` ② Diagnostics: before `MsgPack004 ×2, build fails` → after `none, build passes`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-class-unkeyed",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": true,
+              "before": "MsgPack004 ×2, build fails",
+              "after": "none, build passes"
+            },
+            "short": "[`ref-class-unkeyed` ②](#user-content-trace-ref-class-unkeyed)"
+          }
+        },
+        {
+          "kind": "test",
+          "test": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference_UnkeyedMember",
+          "expects": "fails-before-passes-after",
+          "resolved": {
+            "ok": true,
+            "quote": "test `GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference_UnkeyedMember`: before Failed → after Passed",
+            "data": {
+              "kind": "test",
+              "name": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference_UnkeyedMember",
+              "before": "Failed",
+              "after": "Passed"
+            },
+            "short": "test `ClosedGenericStruct_FromMetadataReference_UnkeyedMember`"
+          }
+        }
+      ],
+      "owner": {
+        "login": null,
+        "source": "unassigned"
+      }
+    },
+    {
+      "question": "Does the generated formatter work in a trimmed or NativeAOT app, where the issue's harm actually occurs?",
+      "reason": "out-of-reach",
+      "detail": "The probe runs the generated code on .NET 8 with the JIT. A trimmed or NativeAOT publish was not built.",
+      "wouldSettleIt": "A NativeAOT publish of the issue's repro that round-trips an object through the generated resolver.",
+      "options": [
+        "Run that publish in CI before merging",
+        "Accept the JIT evidence"
+      ],
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "rtGenerated",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ④ Run time, generated code: before `no generated resolver` → after `out Scope=s; Member.Key=k (intact)`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "④ Run time, generated code",
+              "side": "both",
+              "differs": true,
+              "before": "no generated resolver",
+              "after": "out Scope=s; Member.Key=k (intact)"
+            },
+            "short": "[`issue-repro` ④](#user-content-trace-issue-repro)"
+          }
+        }
+      ],
+      "owner": {
+        "login": null,
+        "source": "unassigned"
+      }
+    },
+    {
+      "question": "In an IDE with project references, are diagnostics for a referenced project's types now dropped too?",
+      "reason": "out-of-reach",
+      "detail": "The filter forwards a diagnostic only if its location is in a syntax tree of the compilation being analyzed, so a type from another project in the same solution is filtered as well. Nothing here runs a multi-project workspace.",
+      "wouldSettleIt": "A two-project Roslyn workspace test, or a check in Visual Studio with a project reference.",
+      "options": [
+        "Add the workspace test",
+        "Accept it as part of the policy decision above"
+      ],
+      "refs": [
+        {
+          "kind": "code",
+          "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "startLine": 1446,
+          "endLine": 1446,
+          "resolved": {
+            "ok": true,
+            "quote": "[TypeCollector.cs line 1446](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1446): `if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.Sourc…`",
+            "data": {
+              "kind": "code",
+              "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+              "where": "TypeCollector.cs line 1446",
+              "url": "https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1446",
+              "start": 1446,
+              "lines": [
+                "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))"
+              ]
+            },
+            "short": "[TypeCollector.cs line 1446](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1446)"
+          }
+        }
+      ],
+      "owner": {
+        "login": null,
+        "source": "unassigned"
+      }
+    }
+  ],
+  "notChecked": [
+    {
+      "item": "What [TypeCollector.cs 985](https://github.com/ZeynelAbidin91/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L985) does",
+      "reason": "removing it from the PR changes nothing in any input that ran, so no input shows what it does (the lines may still run, with the same result either way)",
+      "riskIfWrong": "whatever this part changes is not shown anywhere in this review",
+      "howToCheck": "add an input whose result differs with and without these lines, or a test that fails without them",
+      "computed": true
+    },
+    {
+      "item": "7 other test projects: `MessagePack.AspNetCoreMvcFormatter.Tests`, `MessagePack.Experimental.Tests`, `MessagePack.GeneratedCode.Tests`, `MessagePack.Internal.Tests`, `MessagePack.SourceGenerator.ExecutionTests`, `MessagePack.SourceGenerator.MapModeExecutionTests`, `MessagePack.Tests`",
+      "reason": "only `MessagePack.SourceGenerator.Tests.csproj` was run",
+      "riskIfWrong": "a regression elsewhere in the library would go unnoticed",
+      "howToCheck": "dotnet test tests/MessagePack.AspNetCoreMvcFormatter.Tests/MessagePack.AspNetCoreMvcFormatter.Tests.csproj",
+      "computed": true
+    },
+    {
+      "item": "The wording of the README and doc additions",
+      "reason": "checked against behaviour only, not read for accuracy of every sentence",
+      "riskIfWrong": "the docs describe new behaviour as if it had always been so",
+      "howToCheck": "read `README.md` and `MsgPack004.md` in the diff"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "statement": "The source generator no longer crashes with IndexOutOfRangeException when a member's type is a closed generic struct from a referenced assembly.",
+      "primary": true,
+      "covers": [
+        {
+          "id": "issue-repro",
+          "ran": true,
+          "differs": [
+            "①",
+            "②",
+            "③",
+            "④"
+          ]
+        },
+        {
+          "id": "ref-struct-unkeyed",
+          "ran": true,
+          "differs": [
+            "①",
+            "②",
+            "③",
+            "④"
+          ]
+        }
+      ],
+      "verdict": "met",
+      "note": "The type collector threw before and returns a model after.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "model",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ① Model: before `throws IndexOutOfRangeException` → after `Cmd: Scope, Member; Item<T>: Key`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "① Model",
+              "side": "both",
+              "differs": true,
+              "before": "throws IndexOutOfRangeException",
+              "after": "Cmd: Scope, Member; Item<T>: Key"
+            },
+            "short": "[`issue-repro` ①](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "test",
+          "test": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference",
+          "expects": "fails-before-passes-after",
+          "resolved": {
+            "ok": true,
+            "quote": "test `GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference`: before Failed → after Passed",
+            "data": {
+              "kind": "test",
+              "name": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference",
+              "before": "Failed",
+              "after": "Passed"
+            },
+            "short": "test `ClosedGenericStruct_FromMetadataReference`"
+          }
+        }
+      ],
+      "rule": null
+    },
+    {
+      "id": "R2",
+      "statement": "The analyzer no longer crashes (AD0001) on the same input.",
+      "primary": false,
+      "covers": [
+        {
+          "id": "issue-repro",
+          "ran": true,
+          "differs": [
+            "①",
+            "②",
+            "③",
+            "④"
+          ]
+        },
+        {
+          "id": "ref-struct-unkeyed",
+          "ran": true,
+          "differs": [
+            "①",
+            "②",
+            "③",
+            "④"
+          ]
+        }
+      ],
+      "verdict": "met",
+      "note": "The analyzer crash (AD0001) is gone from the diagnostics.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ② Diagnostics: before `CS8785, AD0001, build passes` → after `none, build passes`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": true,
+              "before": "CS8785, AD0001, build passes",
+              "after": "none, build passes"
+            },
+            "short": "[`issue-repro` ②](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "ref-struct-unkeyed",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-ref-struct-unkeyed",
+            "quote": "`ref-struct-unkeyed` ② Diagnostics: before `CS8785, MsgPack004, AD0001, build fails` → after `none, build passes`",
+            "data": {
+              "kind": "run",
+              "scenario": "ref-struct-unkeyed",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": true,
+              "before": "CS8785, MsgPack004, AD0001, build fails",
+              "after": "none, build passes"
+            },
+            "short": "[`ref-struct-unkeyed` ②](#user-content-trace-ref-struct-unkeyed)"
+          }
+        }
+      ],
+      "rule": null
+    },
+    {
+      "id": "R3",
+      "statement": "A generated resolver and formatters are produced for such types.",
+      "primary": false,
+      "covers": [
+        {
+          "id": "issue-repro",
+          "ran": true,
+          "differs": [
+            "①",
+            "②",
+            "③",
+            "④"
+          ]
+        }
+      ],
+      "verdict": "met",
+      "note": "Generated files appear and the object round-trips through them.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "generated",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ③ C# files: before `0 files` → after `3 files`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "③ C# files",
+              "side": "both",
+              "differs": true,
+              "before": "0 files",
+              "after": "3 files"
+            },
+            "short": "[`issue-repro` ③](#user-content-trace-issue-repro)"
+          }
+        },
+        {
+          "kind": "run",
+          "scenario": "issue-repro",
+          "handoff": "rtGenerated",
+          "side": "both",
+          "expects": "differs",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-issue-repro",
+            "quote": "`issue-repro` ④ Run time, generated code: before `no generated resolver` → after `out Scope=s; Member.Key=k (intact)`",
+            "data": {
+              "kind": "run",
+              "scenario": "issue-repro",
+              "node": "④ Run time, generated code",
+              "side": "both",
+              "differs": true,
+              "before": "no generated resolver",
+              "after": "out Scope=s; Member.Key=k (intact)"
+            },
+            "short": "[`issue-repro` ④](#user-content-trace-issue-repro)"
+          }
+        }
+      ],
+      "rule": null
+    },
+    {
+      "id": "R4",
+      "statement": "Diagnostics for types declared in the project itself are unchanged.",
+      "primary": false,
+      "covers": [
+        {
+          "id": "source-unkeyed-control",
+          "ran": true,
+          "differs": []
+        }
+      ],
+      "verdict": "met",
+      "note": "The in-project control reports the same diagnostics on both sides.",
+      "refs": [
+        {
+          "kind": "run",
+          "scenario": "source-unkeyed-control",
+          "handoff": "diagnostics",
+          "side": "both",
+          "expects": "same",
+          "resolved": {
+            "ok": true,
+            "anchor": "trace-source-unkeyed-control",
+            "quote": "`source-unkeyed-control` ② Diagnostics: `MsgPack004 ×3, build fails` on both sides",
+            "data": {
+              "kind": "run",
+              "scenario": "source-unkeyed-control",
+              "node": "② Diagnostics",
+              "side": "both",
+              "differs": false,
+              "before": "MsgPack004 ×3, build fails",
+              "after": "MsgPack004 ×3, build fails"
+            },
+            "short": "[`source-unkeyed-control` ②](#user-content-trace-source-unkeyed-control)"
+          }
+        }
+      ],
+      "rule": null
+    }
+  ],
+  "confidence": [
+    "Built with .NET SDK 9.0.301, but the repo pins 8.0.402 (rollForward patch); the pin was overridden for this run. Compiler and analyzer behaviour can differ between SDKs."
+  ],
+  "reproduction": {
+    "status": "reproduced",
+    "symptom": {
+      "handoff": "model",
+      "contains": [
+        "IndexOutOfRangeException"
+      ],
+      "why": "The issue reports the generator and analyzer throwing IndexOutOfRangeException while collecting the type."
+    },
+    "node": "① Model",
+    "rows": [
+      {
+        "id": "issue-repro",
+        "ran": true,
+        "seen": true,
+        "match": "IndexOutOfRangeException",
+        "value": "throws IndexOutOfRangeException",
+        "afterRan": true,
+        "seenAfter": false,
+        "afterValue": "Cmd: Scope, Member; Item<T>: Key"
+      }
+    ]
+  },
+  "tests": {
+    "project": "tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj",
+    "after": {
+      "built": true,
+      "total": 170,
+      "passed": 170,
+      "failed": 0,
+      "skipped": 0
+    },
+    "before": {
+      "built": true,
+      "total": 170,
+      "passed": 167,
+      "failed": 3,
+      "skipped": 0,
+      "mode": "source files reverted, the PR's tests kept",
+      "modeId": "tests-kept"
+    },
+    "changes": [
+      {
+        "name": "GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference",
+        "before": "Failed",
+        "after": "Passed"
+      },
+      {
+        "name": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference",
+        "before": "Failed",
+        "after": "Passed"
+      },
+      {
+        "name": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference_UnkeyedMember",
+        "before": "Failed",
+        "after": "Passed"
+      }
+    ],
+    "newTests": [
+      {
+        "name": "GenericsFormatterTests.ClosedGenericRecordStruct_FromMetadataReference",
+        "before": "Failed",
+        "after": "Passed",
+        "verdict": "discriminates"
+      },
+      {
+        "name": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference",
+        "before": "Failed",
+        "after": "Passed",
+        "verdict": "discriminates"
+      },
+      {
+        "name": "GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference_UnkeyedMember",
+        "before": "Failed",
+        "after": "Passed",
+        "verdict": "discriminates"
+      }
+    ],
+    "modifiedTestFiles": [
+      "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs"
+    ],
+    "probe": {
+      "after": "ok",
+      "before": "ok"
+    },
+    "coverage": {
+      "measured": true,
+      "executable": 10,
+      "reached": 10,
+      "byProbe": 8,
+      "byTests": 10,
+      "removedLines": 3,
+      "files": [
+        {
+          "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "inReport": true,
+          "changed": 26,
+          "executable": 10,
+          "byProbe": 8,
+          "byTests": 10,
+          "reached": 10,
+          "unreached": []
+        }
+      ]
+    },
+    "mutation": {
+      "applied": true,
+      "description": "TypeCollector drops the first member of every type it collects",
+      "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+      "probe": "ok"
+    },
+    "ablation": {
+      "ran": true,
+      "hunks": [
+        {
+          "id": "H1",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "label": "TypeCollector.cs 239",
+          "newStart": 239,
+          "newCount": 1,
+          "oldCount": 1,
+          "whole": null,
+          "added": [
+            "        this.reportDiagnostic = reportAnalyzerDiagnostic is null ? null : diagnostic => ReportIfLocatedInCompilation(reportAnalyzerDiagnostic, diagnostic);"
+          ],
+          "removed": [
+            "        this.reportDiagnostic = reportAnalyzerDiagnostic;"
+          ],
+          "moreLines": 0
+        },
+        {
+          "id": "H2",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "label": "TypeCollector.cs 985",
+          "newStart": 985,
+          "newCount": 1,
+          "oldCount": 1,
+          "whole": null,
+          "added": [
+            "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, GetPropertyIdentifierLocation(item), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+          ],
+          "removed": [
+            "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, ((PropertyDeclarationSyntax)item.DeclaringSyntaxReferences[0].GetSyntax()).Identifier.GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+          ],
+          "moreLines": 0
+        },
+        {
+          "id": "H3",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "label": "TypeCollector.cs 1077",
+          "newStart": 1077,
+          "newCount": 1,
+          "oldCount": 1,
+          "whole": null,
+          "added": [
+            "                                    : Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MemberNeedsKey, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name);"
+          ],
+          "removed": [
+            "                                    : Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MemberNeedsKey, item.DeclaringSyntaxReferences[0].GetSyntax().GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name);"
+          ],
+          "moreLines": 0
+        },
+        {
+          "id": "H4",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "label": "TypeCollector.cs 1429–1451",
+          "newStart": 1429,
+          "newCount": 23,
+          "oldCount": 0,
+          "whole": null,
+          "added": [
+            "    /// <summary>",
+            "    /// Gets the location of the identifier of a property, if it is declared in source.",
+            "    /// </summary>",
+            "    /// <param name=\"property\">The property symbol. It may be declared in metadata, in which case <see langword=\"null\" /> is returned.</param>",
+            "    /// <returns>The location of the identifier, or <see langword=\"null\" /> if the property has no declaration in source.</returns>",
+            "    private static Location? GetPropertyIdentifierLocation(IPropertySymbol property) => (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as PropertyDeclarationSyntax)?.Identifier.GetLocation();",
+            "",
+            "    /// <summary>",
+            "    /// Reports a diagnostic only when its location belongs to the compilation being analyzed.",
+            "    /// </summary>",
+            "    /// <remarks>",
+            "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed.",
+            "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported",
+            "    /// against a location that does not exist, which analyzers are not permitted to do.",
+            "    /// </remarks>",
+            "    private void ReportIfLocatedInCompilation(Action<Diagnostic> report, Diagnostic diagnostic)",
+            "    {",
+            "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))",
+            "        {",
+            "            report(diagnostic);",
+            "        }",
+            "    }",
+            ""
+          ],
+          "removed": [],
+          "moreLines": 0
+        }
+      ],
+      "groups": [
+        {
+          "id": "H1",
+          "hunks": [
+            "H1"
+          ],
+          "build": "ok",
+          "probe": "ok"
+        },
+        {
+          "id": "H2",
+          "hunks": [
+            "H2"
+          ],
+          "build": "ok",
+          "probe": "ok"
+        },
+        {
+          "id": "H3",
+          "hunks": [
+            "H3"
+          ],
+          "build": "ok",
+          "probe": "ok"
+        },
+        {
+          "id": "H1+H2+H4",
+          "hunks": [
+            "H1",
+            "H2",
+            "H4"
+          ],
+          "build": "ok",
+          "probe": "ok"
+        }
+      ],
+      "runs": 5
+    },
+    "sdk": "9.0.301",
+    "pinnedSdk": {
+      "version": "8.0.402",
+      "rollForward": "patch",
+      "allowPrerelease": false
+    },
+    "rollForwardSdk": true,
+    "changedFiles": [
+      {
+        "status": "M",
+        "path": "README.md"
+      },
+      {
+        "status": "M",
+        "path": "doc/analyzers/MsgPack004.md"
+      },
+      {
+        "status": "M",
+        "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs"
+      },
+      {
+        "status": "M",
+        "path": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs"
+      }
+    ],
+    "runner": "win32"
+  },
+  "unverified": [],
+  "sensitivity": {
+    "ran": true,
+    "description": "TypeCollector drops the first member of every type it collects",
+    "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+    "scenarios": 4,
+    "detected": 4,
+    "where": [
+      "① Model",
+      "③ C# files",
+      "④ Run time, default",
+      "④ Run time, generated code"
+    ],
+    "rows": [
+      {
+        "id": "issue-repro",
+        "handoffs": [
+          "① Model",
+          "③ C# files",
+          "④ Run time, default",
+          "④ Run time, generated code"
+        ]
+      },
+      {
+        "id": "ref-struct-unkeyed",
+        "handoffs": [
+          "① Model",
+          "③ C# files",
+          "④ Run time, default",
+          "④ Run time, generated code"
+        ]
+      },
+      {
+        "id": "ref-class-unkeyed",
+        "handoffs": [
+          "① Model",
+          "③ C# files",
+          "④ Run time, default",
+          "④ Run time, generated code"
+        ]
+      },
+      {
+        "id": "source-unkeyed-control",
+        "handoffs": [
+          "① Model",
+          "③ C# files",
+          "④ Run time, default",
+          "④ Run time, generated code"
+        ]
+      }
+    ]
+  },
+  "effects": {
+    "ran": true,
+    "groups": [
+      {
+        "id": "H1",
+        "side": "without-H1",
+        "hunks": [
+          {
+            "id": "H1",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 239",
+            "newStart": 239,
+            "newCount": 1,
+            "oldCount": 1,
+            "whole": null,
+            "added": [
+              "        this.reportDiagnostic = reportAnalyzerDiagnostic is null ? null : diagnostic => ReportIfLocatedInCompilation(reportAnalyzerDiagnostic, diagnostic);"
+            ],
+            "removed": [
+              "        this.reportDiagnostic = reportAnalyzerDiagnostic;"
+            ],
+            "moreLines": 0
+          }
+        ],
+        "build": "ok",
+        "errors": [],
+        "needed": [
+          {
+            "scenario": "ref-class-unkeyed",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          }
+        ],
+        "partly": [
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          }
+        ],
+        "notNeeded": [
+          {
+            "scenario": "issue-repro",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "sideEffects": []
+      },
+      {
+        "id": "H2",
+        "side": "without-H2",
+        "hunks": [
+          {
+            "id": "H2",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 985",
+            "newStart": 985,
+            "newCount": 1,
+            "oldCount": 1,
+            "whole": null,
+            "added": [
+              "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, GetPropertyIdentifierLocation(item), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+            ],
+            "removed": [
+              "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, ((PropertyDeclarationSyntax)item.DeclaringSyntaxReferences[0].GetSyntax()).Identifier.GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+            ],
+            "moreLines": 0
+          }
+        ],
+        "build": "ok",
+        "errors": [],
+        "needed": [],
+        "partly": [],
+        "notNeeded": [
+          {
+            "scenario": "issue-repro",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "ref-class-unkeyed",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          }
+        ],
+        "sideEffects": []
+      },
+      {
+        "id": "H3",
+        "side": "without-H3",
+        "hunks": [
+          {
+            "id": "H3",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 1077",
+            "newStart": 1077,
+            "newCount": 1,
+            "oldCount": 1,
+            "whole": null,
+            "added": [
+              "                                    : Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MemberNeedsKey, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name);"
+            ],
+            "removed": [
+              "                                    : Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MemberNeedsKey, item.DeclaringSyntaxReferences[0].GetSyntax().GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name);"
+            ],
+            "moreLines": 0
+          }
+        ],
+        "build": "ok",
+        "errors": [],
+        "needed": [
+          {
+            "scenario": "issue-repro",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "partly": [
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          }
+        ],
+        "notNeeded": [
+          {
+            "scenario": "ref-class-unkeyed",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          }
+        ],
+        "sideEffects": []
+      },
+      {
+        "id": "H1+H2+H4",
+        "side": "without-H1+H2+H4",
+        "hunks": [
+          {
+            "id": "H1",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 239",
+            "newStart": 239,
+            "newCount": 1,
+            "oldCount": 1,
+            "whole": null,
+            "added": [
+              "        this.reportDiagnostic = reportAnalyzerDiagnostic is null ? null : diagnostic => ReportIfLocatedInCompilation(reportAnalyzerDiagnostic, diagnostic);"
+            ],
+            "removed": [
+              "        this.reportDiagnostic = reportAnalyzerDiagnostic;"
+            ],
+            "moreLines": 0
+          },
+          {
+            "id": "H2",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 985",
+            "newStart": 985,
+            "newCount": 1,
+            "oldCount": 1,
+            "whole": null,
+            "added": [
+              "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, GetPropertyIdentifierLocation(item), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+            ],
+            "removed": [
+              "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, ((PropertyDeclarationSyntax)item.DeclaringSyntaxReferences[0].GetSyntax()).Identifier.GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+            ],
+            "moreLines": 0
+          },
+          {
+            "id": "H4",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "label": "TypeCollector.cs 1429–1451",
+            "newStart": 1429,
+            "newCount": 23,
+            "oldCount": 0,
+            "whole": null,
+            "added": [
+              "    /// <summary>",
+              "    /// Gets the location of the identifier of a property, if it is declared in source.",
+              "    /// </summary>",
+              "    /// <param name=\"property\">The property symbol. It may be declared in metadata, in which case <see langword=\"null\" /> is returned.</param>",
+              "    /// <returns>The location of the identifier, or <see langword=\"null\" /> if the property has no declaration in source.</returns>",
+              "    private static Location? GetPropertyIdentifierLocation(IPropertySymbol property) => (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as PropertyDeclarationSyntax)?.Identifier.GetLocation();",
+              "",
+              "    /// <summary>",
+              "    /// Reports a diagnostic only when its location belongs to the compilation being analyzed.",
+              "    /// </summary>",
+              "    /// <remarks>",
+              "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed.",
+              "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported",
+              "    /// against a location that does not exist, which analyzers are not permitted to do.",
+              "    /// </remarks>",
+              "    private void ReportIfLocatedInCompilation(Action<Diagnostic> report, Diagnostic diagnostic)",
+              "    {",
+              "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))",
+              "        {",
+              "            report(diagnostic);",
+              "        }",
+              "    }",
+              ""
+            ],
+            "removed": [],
+            "moreLines": 0
+          }
+        ],
+        "build": "ok",
+        "errors": [],
+        "needed": [
+          {
+            "scenario": "ref-class-unkeyed",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          }
+        ],
+        "partly": [
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          }
+        ],
+        "notNeeded": [
+          {
+            "scenario": "issue-repro",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "diagnostics",
+            "node": "② Diagnostics"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "issue-repro",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "model",
+            "node": "① Model"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "generated",
+            "node": "③ C# files"
+          },
+          {
+            "scenario": "ref-struct-unkeyed",
+            "handoff": "rtGenerated",
+            "node": "④ Run time, generated code"
+          }
+        ],
+        "sideEffects": []
+      }
+    ],
+    "runs": 5
+  },
+  "integrity": {
+    "files": [
+      {
+        "name": "scenarios.json",
+        "sha256": "2c5fd332dc7799c99db9347c7ca16a071d09dbf8d2f6a1f4fdcd705df7e1b42f"
+      },
+      {
+        "name": "probe-before.json",
+        "sha256": "eea6b7aef0a661b4c841d203af51c9a1bacdf04cf40fa0ce07dc96246c505e3f"
+      },
+      {
+        "name": "probe-after.json",
+        "sha256": "ebc946df2ab7fcc2fd392b8ecaed5286d0d64df17ac026975f40a2a0415b2908"
+      },
+      {
+        "name": "probe-mutant.json",
+        "sha256": "8c3f77ca4b589df146facb6e210ccf6ae66bd57464578424b85fc75fdcd5d1f5"
+      },
+      {
+        "name": "tests.json",
+        "sha256": "ea372f32c97fbff2ec503ae831f04368db68b05ec69c82a928067a9096861a4b"
+      },
+      {
+        "name": "probe-without-H1.json",
+        "sha256": "ff55fc3802ba30c1894dafa61d1d42ce0aadec4442b81efaab852869517917f7"
+      },
+      {
+        "name": "probe-without-H2.json",
+        "sha256": "ebc946df2ab7fcc2fd392b8ecaed5286d0d64df17ac026975f40a2a0415b2908"
+      },
+      {
+        "name": "probe-without-H3.json",
+        "sha256": "a62000c469a2674f69759a0fd46f6ce1edddb30de1839cc282fe69349fdd9182"
+      },
+      {
+        "name": "probe-without-H1+H2+H4.json",
+        "sha256": "ff55fc3802ba30c1894dafa61d1d42ce0aadec4442b81efaab852869517917f7"
+      }
+    ],
+    "artifact": null,
+    "replay": "node .review-map/review.mjs replay --from .review-map/evidence/2283 --scenario {id} --repo <checkout of 9df83c38>"
+  }
+}
