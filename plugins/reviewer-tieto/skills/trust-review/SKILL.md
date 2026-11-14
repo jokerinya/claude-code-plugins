@@ -116,12 +116,14 @@ Record the review in the ledger:
 `dossier.md` is the full record. Reviewers read the PR, so also write `$OUT/pr-comment.md`: GitHub-flavoured markdown that a named owner can act on from the **first screen**, with everything else folded. Build it only from `dossier.json`, `citation-check.json`, `lenses/verifier.json`, `area-trust.json` and `trust_ledger.py metrics --json`: no new claims.
 
 Rules:
-- **First screen = the card.** Header, recommendation, the most important refused decision, the "checked by" table, not checked, read these hunks, you accept, sign-off. Everything else goes inside `<details>`.
-- **Use these headings, in the challenge's words:** "What the AI found", "What the AI refused to decide, and why", "What was checked, and by whom or what", "What was not checked, and why", "Residual risk you accept by signing".
-- **No score, gauge or percentage confidence.** Confidence is shown only as an evidence class tag on each row (`E1 executed`, `E2 traced`, `E3 inferred`) and as counts anyone can check.
-- **Alerts:** `> [!CAUTION]` for an outcome of `NOT-FIX` or `BLOCK`, or for an abstention backed by E1 evidence against a binding criterion; `> [!IMPORTANT]` for the other abstentions shown on the card (at most 2); `> [!NOTE]` for residual risk.
+- **The 10-second test.** Someone opening the PR must get the main points without scrolling or clicking. Above the fold there are only four things: the header with tier, time and owner; **one** alert box of one or two plain sentences; the one-row glance table; the sign-off line. Everything else goes in `<details>` toggles.
+- **The glance table has exactly four cells, counts only:** 🔎 AI found (blocking · notes) · 🤚 AI refused to decide (n questions for you) · 👀 You read (lines of total, plus tests) · ⚠️ You accept (n known risks). No prose in the cells.
+- **Toggle order**, each `<summary>` with its icon and a count: 🤚 What the AI refused to decide, and why · 👀 Read these hunks · ⚠️ Residual risk you accept by signing · 🔎 What the AI found · ✅ What was checked, and by whom or what · 🚫 What was not checked, and why · 📋 Requirement trace · 🧩 The change in its own words · 🧪 Verifier log.
+- **"What was checked" is a bullet list, not a table:** `**Check:** result · by whom or what · evidence class`. One line each.
+- **Alert:** `> [!CAUTION]` for `NOT-FIX`, `BLOCK`, or an abstention backed by E1 evidence against a binding criterion; `> [!WARNING]` for T2; `> [!NOTE]` for T0/T1 with nothing decisive. Write it for someone who has not read the issue: say what not to do and why, with no ids or jargon.
+- **No score, gauge or percentage confidence.** Confidence is shown only as an evidence class (`E1 executed`, `E2 traced`, `E3 inferred`) and as counts anyone can check.
 - **Hunks are links** when the repo slug and head sha are known: `[TypeCollector.cs:1008](https://github.com/<slug>/blob/<sha>/<path>#L1008)`.
-- **Area trust comes from the ledger only.** With no signed history, write `neutral (no signed history)`. Never invent a track record; mark seeded history `synthetic`.
+- **Area trust comes from the ledger only** and goes in the footer. With no signed history, write `neutral (no signed history)`. Never invent a track record; mark seeded history `synthetic`.
 - Leave out the parts written for evaluators (holdout scorecards, lessons logs): they belong in `docs/`.
 - Stay under 60,000 characters (GitHub's comment limit is 65,536). If longer, cut the folded sections and link to `dossier.md`.
 
@@ -129,37 +131,28 @@ Template:
 
 ```
 ### 🔍 Trust Dossier · <REQ-ID> · `<short sha>` · <STATUS>
-**Owner:** <name> · **Recommendation:** <one line> · **Est. owner time:** ~<n> min
+**<tier> <read depth> · ~<n> min** · Owner: <name>
 
 > [!CAUTION]
-> **<the decisive fact or refused decision>.** <one sentence of evidence, with class>. Decider: <role>.
+> **<what not to do, in plain words>.** <one sentence of evidence> (`<evidence class>`).
 
-**Evidence:** citations <ok>/<total> ✓ · <n> commands executed · verifier: <c> confirmed · <w> weakened · <r> refuted · <u> left to humans · highest class <E#>
-
-#### What was checked, and by whom or what
-| Check | By | Result | Evidence |
-
-#### What was not checked, and why
-- <one line each, max 5; the rest folded>
-
-#### Read these hunks (<tier>, <n> of <total> changed lines)
-- **U#** <area> · <why, rule ids> · <linked hunks>
-
-#### Residual risk you accept by signing
-> [!NOTE]
-> - <plain sentences>
-
-**Area trust (ledger):** <area>: <state> (<signed reviews> signed, <escapes> escapes) · …
+| 🔎 AI found | 🤚 AI refused to decide | 👀 You read | ⚠️ You accept |
+|:-:|:-:|:-:|:-:|
+| <b> blocking · <n> notes | **<n> questions for you** | <n> of <total> lines + <n> tests | <n> known risks |
 
 **Sign off:** `/reviewer-tieto:sign-off <REVIEW_ID>` · The AI does not approve. A named human signs.
 
-<details><summary><b>What the AI found</b> (<n> confirmed · <n> blocking)</summary> table: Id · Lens · Severity · Finding · path:line · Evidence · Verifier </details>
-<details><summary><b>What the AI refused to decide, and why</b> (<n>)</summary> table: Id · Question · Why the AI did not decide · Evidence that would settle it · Decider </details>
-<details><summary><b>Requirement trace</b> (R0–R#)</summary> … </details>
-<details><summary><b>The change in its own words</b> (<n> units)</summary> … </details>
-<details><summary>Verifier log and rejected AI findings</summary> … </details>
+<details><summary>🤚 <b>What the AI refused to decide, and why</b> (<n> questions)</summary> table: # · Question · Why the AI did not decide · Evidence that would settle it · Decider </details>
+<details><summary>👀 <b>Read these hunks</b> (<tier>)</summary> one bullet per unit: **U#** area · why (rule ids) · linked hunks </details>
+<details><summary>⚠️ <b>Residual risk you accept by signing</b> (<n>)</summary> plain sentences </details>
+<details><summary>🔎 <b>What the AI found</b> (<n> findings · <c> confirmed · <w> weakened · <b> blocking)</summary> table: Id · Lens · Severity · Finding · Where · Evidence · Verifier </details>
+<details><summary>✅ <b>What was checked, and by whom or what</b></summary> bullets </details>
+<details><summary>🚫 <b>What was not checked, and why</b></summary> bullets </details>
+<details><summary>📋 <b>Requirement trace</b> (R0–R#)</summary> table </details>
+<details><summary>🧩 <b>The change in its own words</b> (<n> units)</summary> table </details>
+<details><summary>🧪 <b>Verifier log</b></summary> citations, verdict counts, executed commands, rejected AI findings, contract violations </details>
 
-<sub>reviewer-tieto <version> · profile <id> · review <REVIEW_ID> · full record: `.trust-review/reviews/<REVIEW_ID>/dossier.md`</sub>
+<sub>Area trust (ledger): <area: state, …> · reviewer-tieto <version> · profile <id> · review <REVIEW_ID> · full record: `.trust-review/reviews/<REVIEW_ID>/dossier.md`</sub>
 ```
 
 To post it on the PR (only when the user asks): `gh pr comment <pr> --body-file $OUT/pr-comment.md`.
