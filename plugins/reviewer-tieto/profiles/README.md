@@ -7,6 +7,8 @@ profiles/<id>/
   profile.json        id, match rules, test commands, deciders, provenance
   policy.json         risk areas, content rules, generated file pairs, tiers, trust thresholds (replaces the core policy)
   lenses/<lens>.md    addendum per lens (correctness, security, compatibility, documentation, verifiability, intent)
+  run-tests.sh        the ONLY way the verifier executes code: run-tests.sh <worktree> check|setup|test <target> [filter]
+                      (one allow-list rule; refuses the main working tree; toolchain quirks live here)
 ```
 
 **Resolution** (`skills/trust-review/scripts/resolve_profile.py`): the team's own `<repo>/.trust-review/profile/` wins. Otherwise the plugin uses a bundled profile whose `match` hits (remote URL or files). Otherwise there is no profile, and the dossier says the review used generic rules only.
