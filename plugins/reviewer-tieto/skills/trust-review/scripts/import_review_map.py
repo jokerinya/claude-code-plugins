@@ -134,7 +134,13 @@ def build(run_dir, head, merge_base):
                 len(not_proving), ", ".join(not_proving))
         claim("EX-PROOF", text)
     if cov.get("measured"):
-        unreached = ["%s:%s" % (f["path"], ",".join(str(n) for n in f["unreached"]))
+        def span(u):
+            # review-map records an unreached stretch as [first, last]; older runs as one number.
+            if isinstance(u, (list, tuple)) and u:
+                return str(u[0]) if u[0] == u[-1] else "%s-%s" % (u[0], u[-1])
+            return str(u)
+
+        unreached = ["%s:%s" % (f["path"], ",".join(span(u) for u in f["unreached"]))
                      for f in cov.get("files") or [] if f.get("unreached")]
         text = "%s of %s executable changed lines ran (%s by chosen inputs, %s by tests)." % (
             cov.get("reached"), cov.get("executable"), cov.get("byProbe"), cov.get("byTests"))
