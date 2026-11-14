@@ -1,0 +1,14 @@
+{
+  "name": "agentlemen",
+  "owner": {
+    "name": "agentlemen team"
+  },
+  "description": "Agentlemen Hackaton Claude Code plugins and skills.",
+  "plugins": [
+    {
+      "name": "reviewer-tieto",
+      "source": "./plugins/reviewer-tieto",
+      "description": "Earned-trust AI code review: risk-routed lenses, adversarial verification and a Trust Dossier that a named human signs, with outcome metrics."
+    }
+  ]
+}
